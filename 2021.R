@@ -78,3 +78,5 @@ siteSummary2021 <- data.frame(siteID = character(), startDate = as.Date(characte
 ## Checking summary table for 2021 
 nrow(siteSummary2021)
 siteSummary2021
+# Saving siteSummary2021 as CSV file
+write.csv(siteSummary2021, "siteSummary2021.csv", row.names=FALSE)

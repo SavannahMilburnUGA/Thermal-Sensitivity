@@ -80,3 +80,34 @@ nrow(siteSummary2021)
 siteSummary2021
 # Saving siteSummary2021 as CSV file
 write.csv(siteSummary2021, "siteSummary2021.csv", row.names=FALSE)
+## Conclusions: (see below for specifics: where dates are missing)
+# Site 10598088 has 47 missing days in 6/23/2020 - 10/26/2021
+# Site 20733169 has 5 missing days in 6/23/2020 - 10/7/2021
+# USGS Site 3 has 2 missing days in 6/15/2021 - 10/1/2021 
+
+## Finding overlapping dates
+# Compare via latest start date & earliest end date (later start date means all prior dates included, vice versa for end date)
+library(ggplot2)
+library(lubridate)
+# Create a frequency table for the start dates
+freqStartDates <- table(siteSummary2021$startDate)
+barplot(freqStartDates, main = "Frequency of Start Dates for 2021 CRB Sites", xlab = "Start Date", ylab = "# Sites", las =2)
+length(freqStartDates)
+print(freqStartDates)
+## FINDINGS: 
+# 23 sites start at 12/31/2020 , 10 sites start at 6/23/2021
+# If we start at 7/22/2021 all sites included ?
+## SITES w/ MISSING DATES & where MISSING DATES OCCURRING
+## Not site 10598088 since missing 8/6/2021 to 9/21/2021
+## Not site 20733169 missing 8/20/2021 to 8/24/2021
+# If we start at 7/1 - all sites except 5 included
+
+# Create a frequency table for the end dates
+freqEndDates <- table(siteSummary2021$endDate)
+barplot(freqEndDates, main = "Frequency of End Dates for 2021 CRB Sites", xlab = "End Date", ylab = "# Sites", las =2)
+length(freqEndDates)
+print(freqEndDates)
+# 10 sites end at 10/1/2021, 11 sites end at 10/22/2021, 11 sites end at 10/26/2021
+# If we end at 8/2/2021 (8/1/2021 cleaner) all sites included ?
+# If we end at 9/1/2021 - all sites except 1
+# If we end at 10/1/2021 - all sites except 8

@@ -12,8 +12,8 @@ while (!is.null(dev.list())) dev.off()
 # 	1. Creating site table using the Filename from master spreadsheet
 		# a. Columns = lat, long, siteID
 # Eventually other site attributes/landscape variables, and daily mean/max from 2021 (only commonly sampled dates)
-
-# Reading in 2021 CRB data
+# ------------------------------------------------------------------------------------------------------------------------------------------------
+## Reading in 2021 CRB data
 library(readxl)  
 file2021 = "C:/Users/savan/OneDrive/Desktop/NSF PSU REU/Thermal Sensitivity/Thermal-Sensitivity/ClackData2021.xlsx"
 # Check for file exists
@@ -30,7 +30,7 @@ length(sites2021)
 listOfSites <- lapply(sites2021, function(x) {as.data.frame(read_excel(file2021, sheet = x))})
 # Rename elements in list to be the names of the sheet names
 names(listOfSites) <- sites2021
-
+# ------------------------------------------------------------------------------------------------------------------------------------------------
 ## Checking listOfSites:
 # Checking sheets read
 length(listOfSites)
@@ -50,7 +50,7 @@ lapply(listOfSites, head, n = 3)
 lapply(listOfSites, function(x) sapply(x, class))
 # Look at a specific sheet
 head(listOfSites[["2400469"]])
-
+# ------------------------------------------------------------------------------------------------------------------------------------------------
 ## Comparing to find overlapping dates across 2021 sites:
 # Creating summary dataframe: 
 # Site - Start Date - End date - Total Days Record - Missing Days

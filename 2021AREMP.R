@@ -14,7 +14,7 @@ while (!is.null(dev.list())) dev.off()
 # ------------------------------------------------------------------------------------------------------------------------------------------------
 ## Reading in 2021 AREMP data
 library(readxl)  
-fileAREMP2021 = "C:/Users/savan/OneDrive/Desktop/NSF PSU REU/Thermal Sensitivity/Thermal-Sensitivity/AREMP2_2021_IN.csv"
+fileAREMP2021 = "C:/Users/savan/OneDrive/Desktop/NSF PSU REU/Thermal Sensitivity/Thermal-Sensitivity/data/streamTemp/2021/AREMP2_2021_IN.csv"
 # Check for file exists
 file.exists(fileAREMP2021)
 print(fileAREMP2021)

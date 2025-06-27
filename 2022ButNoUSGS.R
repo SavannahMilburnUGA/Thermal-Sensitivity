@@ -5,7 +5,7 @@
 rm(list = ls())
 # Close old plots
 while (!is.null(dev.list())) dev.off()
-#### NEED TO REPLACE FILE IN FOLDER SINCE DELETED 2 COLUMNS from 20941696
+#### NEED TO REPLACE FILE IN FOLDER SINCE DELETED 2 COLUMNS from 20941696 THIS 
 
 # WANT: data frame of Logger - Datetime - Temp, C 
 # Sheets also have graphs btw

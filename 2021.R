@@ -15,7 +15,7 @@ while (!is.null(dev.list())) dev.off()
 # ------------------------------------------------------------------------------------------------------------------------------------------------
 ## Reading in 2021 CRB data
 library(readxl)  
-file2021 = "C:/Users/savan/OneDrive/Desktop/NSF PSU REU/Thermal Sensitivity/Thermal-Sensitivity/ClackData2021.xlsx"
+file2021 = "C:/Users/savan/OneDrive/Desktop/NSF PSU REU/Thermal Sensitivity/Thermal-Sensitivity/data/streamTemp/2021/ClackData2021.xlsx"
 # Check for file exists
 file.exists(file2021)
 print(file2021)

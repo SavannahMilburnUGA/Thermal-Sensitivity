@@ -1,11 +1,10 @@
-# Cleaning data for 2022 Clackamas Data - this time 2022 CRB data does NOT have 2022 USGS data
+# Cleaning data for 2022 Clackamas Data - 2022 CRB data does NOT have 2022 USGS data
 
 # Clean house & remove saved files (keeping it clean)
 # Remove all objects in workspace 
 rm(list = ls())
 # Close old plots
-while (!is.null(dev.list())) dev.off()
-#### NEED TO REPLACE FILE IN FOLDER SINCE DELETED 2 COLUMNS from 20941696 THIS 
+while (!is.null(dev.list())) dev.off() 
 
 # WANT: data frame of Logger - Datetime - Temp, C 
 # Sheets also have graphs btw

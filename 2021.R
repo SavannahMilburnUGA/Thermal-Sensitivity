@@ -40,8 +40,6 @@ length(listOfSites)
 length(sites2021)
 # Check names of list elements
 names(listOfSites)
-# Check structure of list: all have 5 variables
-str(listOfSites, max.level=1)
 # View first few rows of each sheet
 lapply(listOfSites, head, n = 3)
 # Look at a specific sheet
@@ -85,6 +83,11 @@ CRBStreamTemperatureMMM2021
 nrow(CRBStreamTemperatureMMM2021) # 12953
 # Save CRB 2021 stream temperature data frame
 saveRDS(CRBStreamTemperatureMMM2021, "CRBDailyStreamTemps2021.rds")
+
+# Finding unique sites for CRB 2021 Data
+uniqueSiteIDs <- unique(CRBStreamTemperatureMMM2021$siteID)
+uniqueSiteIDs
+length(uniqueSiteIDs) # 72 unique sites
 # ------------------------------------------------------------------------------------------------------------------------------------------------
 ## Add 1 AREMP site: deploy_ORCUB001IN02 : 1/1/2021 - 12/31/2021 // has FULL YEAR
 # Reading in 2021 AREMP data
@@ -104,7 +107,6 @@ sitesAREMP2021$date <- as.Date(sitesAREMP2021$date, format = "%m/%d/%Y")
 ## Get unique deploy IDs/AREMP sites
 uniqueDeploys <- unique(sitesAREMP2021$deploy)
 length(uniqueDeploys)
-print(uniqueDeploys)
 # Only 1 deploy has compatible dates
 deploy_ORCUB001IN02 <- sitesAREMP2021[sitesAREMP2021$deploy == "ORCUB001IN02", ]
 head(deploy_ORCUB001IN02)
@@ -132,13 +134,47 @@ AREMPStreamTemperatureMMM2021
 nrow(AREMPStreamTemperatureMMM2021) # 365
 # Save 1 AREMP 2021 stream temperature data frame
 saveRDS(AREMPStreamTemperatureMMM2021, "AREMPDailyStreamTemps2021.rds")
+# ------------------------------------------------------------------------------------------------------------------------------------------------
+## Match coordinates to CRB 2021 sites
+coordinatesFile2021 = "C:/Users/savan/OneDrive/Desktop/NSF PSU REU/Thermal Sensitivity/Thermal-Sensitivity/data/streamTemp/2021/Water temp data logs master 2021.xlsx"
+# Check if file exists
+file.exists(coordinatesFile2021)
+# Skip header info in coordinate file
+coordinates2021 <- read_excel(coordinatesFile2021, skip = 5)
+# Select only coordinates and site ID - E, F, N columns
+coordinates2021 <- coordinates2021 %>%
+    select(`GPS lat.`, `GPS long.`, `Filename of downloaded data`)
+# Convert siteID out of scientific notation
+coordinates2021 <- coordinates2021 %>%
+    filter(!is.na(`Filename of downloaded data`) & 
+           `Filename of downloaded data` != "" &
+           !is.na(as.numeric(`Filename of downloaded data`))) %>%  # Keep only valid numeric entries
+    mutate(siteID = sprintf("%.0f", as.numeric(`Filename of downloaded data`))) %>%
+    select(lat = `GPS lat.`, lon = `GPS long.`, siteID) %>%
+    distinct()
+# Only keep coordinates for 72 unique sites I am including in analysis for 2021 Test Case
+coordinates2021 <- coordinates2021 %>%
+  filter(siteID %in% uniqueSiteIDs)
+length(uniqueSiteIDs)
+nrow(coordinates2021)
 
-
-
-# 	1. Creating site table using the Filename from master spreadsheet
-		# a. Columns = lat, long, siteID
+# 72 unique sites for CRB 2021 data, 68 unique sites w/ coordinates = 4 unique sites that need coordinates added
+# Adding 4 unique sites missing their coordinates: Site 20201001A & 3 USGS sites: 1, 2, 4
+coordinates2021 <- coordinates2021 %>%
+    add_row(siteID = "20201001A", lat = 45.412205, lon = -122.505561) %>%
+    add_row(siteID = "USGS 1", lat = 45.16722, lon = -122.155) %>%
+    add_row(siteID = "USGS 2", lat = 45.3, lon = -122.35278) %>%
+    add_row(siteID = "USGS 4", lat = 45.14778, lon = -122.15194)
+nrow(coordinates2021) # 72
+# ------------------------------------------------------------------------------------------------------------------------------------------------
+# Adding 1 AREMP site to coordinates2021
+coordinates2021 <- coordinates2021 %>%
+    add_row(siteID = "ORCUB001IN02", lat = 44.886616596029, lon = -121.883197021033) 
+# Checking
+nrow(coordinates2021) # 73
+coordinates2021
+# Save coordinates2021 file 
+write.csv(coordinates2021, "coordinates2021.csv", row.names=FALSE)
+# ------------------------------------------------------------------------------------------------------------------------------------------------
+# Michael: sitetable with lat, long, siteID columns
 # Eventually other site attributes/landscape variables, and daily mean/max from 2021 (only commonly sampled dates)## Getting 2021 CRB data coordinates for 74 sites
-# coordinatesFile2021 = "C:/Users/savan/OneDrive/Desktop/NSF PSU REU/Thermal Sensitivity/Thermal-Sensitivity/data/streamTemp/2021/Water temp data logs master 2021.xlsx"
-# coordinates2021 <- read_excel(coordinatesFile2021) %>%
-#     select(siteID = 'Filename of download', lat = 'GPS lat.', lon = 'GPS long.') %>%
-#     distinct()

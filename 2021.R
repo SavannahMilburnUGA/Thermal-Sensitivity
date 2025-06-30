@@ -111,3 +111,8 @@ print(freqEndDates)
 # If we end at 8/2/2021 (8/1/2021 cleaner) all sites included ?
 # If we end at 9/1/2021 - all sites except 1
 # If we end at 10/1/2021 - all sites except 8
+
+
+# Need 74 CRB sites for July 1 - Aug 31 (7/1/2021 - 8/31/2021)
+# 1 AREMP site
+# Need to combine AREMP + USGS sites + get coordinates

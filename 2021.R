@@ -1,4 +1,6 @@
-# Getting stream temperature & air temperature values for 72 from CRB + 1 AREMP site  
+# Getting stream temperature & air temperature values for 72 from CRB + 1 AREMP site 
+# Details for 2021 CRB Data found in 2021 branch
+# Details for 2021 AREMP Data found in 2021AREMP branch 
 
 # Clean house & remove saved files (keeping it clean)
 # Remove all objects in workspace 
@@ -6,8 +8,9 @@ rm(list = ls())
 # Close old plots
 while (!is.null(dev.list())) dev.off()
 
-# WANT: data frame of Logger - Series # - Date - Time - Temp in C 
-## Create data frame of deploy - date - Year - time - tempC
+# Data frame formats are - for combining after PRISM values gotten
+# CRB: Logger - Series # - Date - Time - Temp, C 
+# AREMP: deploy - date - Year - time - tempC
 
 
 ### Getting 2021 Stream Temperature Data: 72 sites from CRB + 1 AREMP site: 

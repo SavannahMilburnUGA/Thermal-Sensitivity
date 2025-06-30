@@ -33,6 +33,7 @@ print(uniqueDeploys)
 # 4 deploys: ORCUB001IN02, ORHOT001IN01, ORHRK001IN01, ORHRK001IN02
 # Separate AREMP 2021 data into 4 data frame objects by 4 deploy IDs
 deploy_ORCUB001IN02 <- sitesAREMP2021[sitesAREMP2021$deploy == "ORCUB001IN02", ]
+head(deploy_ORCUB001IN02)
 deploy_ORHOT001IN01 <- sitesAREMP2021[sitesAREMP2021$deploy == "ORHOT001IN01", ]
 deploy_ORHRK001IN01 <- sitesAREMP2021[sitesAREMP2021$deploy == "ORHRK001IN01", ]
 deploy_ORHRK001IN02 <- sitesAREMP2021[sitesAREMP2021$deploy == "ORHRK001IN02", ]

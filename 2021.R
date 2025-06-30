@@ -309,3 +309,25 @@ substr(names(tmax_stack)[1:3], start=25, stop =32)
 tmax_long_result <- pivot_longer(tmax_result, -site, names_to = "date", values_to = "tmax_C")
 # Convert date strings to Date objects
 tmax_long_result$date <- as.Date(tmax_long_result$date, format = "%Y%m%d") 
+# ------------------------------------------------------------------------------------------------------------------------------------------------
+## Combine daily tmean, tmin, tmax air temperature datasets from PRISM
+airTemperature2021 <- tmean_long_result %>%
+    left_join(tmin_long_result, by = c("site", "date")) %>%
+    left_join(tmax_long_result, by = c("site", "date"))
+# Checking airTemperature2021 
+head(airTemperature2021)
+nrow(airTemperature2021) # Should be 4,526 rows (73 sites × 62 days)
+ncol(airTemperature2021) # Should be 5 columns (site, date, tmean_C, tmin_C, tmax_C)
+range(airTemperature2021$date) # 7/1/2021 - 8/31/2021
+# ------------------------------------------------------------------------------------------------------------------------------------------------
+## Saving PRISM results
+# Saving combined daily tmean, tmin, tmax air temperature data
+saveRDS(airTemperature2021, "airTemperature2021.rds")
+write_csv(airTemperature2021, "airTemperature2021.csv")
+# Saving tmean, tmin, tmax air temperature datasets individually
+saveRDS(tmean_long_result, "tmean_long_result.rds")
+write_csv(tmean_long_result, "tmean_long_result.csv")
+saveRDS(tmin_long_result, "tmin_long_result.rds")
+write_csv(tmin_long_result, "tmin_long_result.csv")
+saveRDS(tmax_long_result, "tmax_long_result.rds")
+write_csv(tmax_long_result, "tmax_long_result.csv")

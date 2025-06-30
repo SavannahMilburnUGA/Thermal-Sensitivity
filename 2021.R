@@ -176,5 +176,61 @@ coordinates2021
 # Save coordinates2021 file 
 write.csv(coordinates2021, "coordinates2021.csv", row.names=FALSE)
 # ------------------------------------------------------------------------------------------------------------------------------------------------
-# Michael: sitetable with lat, long, siteID columns
-# Eventually other site attributes/landscape variables, and daily mean/max from 2021 (only commonly sampled dates)## Getting 2021 CRB data coordinates for 74 sites
+## Extracting 2021 July 1 - Aug 31, 2021 Air Temperature data (daily mean, min, max)
+# Load necessary packages
+library(prism)   
+library(terra)  
+library(dplyr)
+library(tidyr)  
+# Set the folder where PRISM raster files will be saved
+prism_set_dl_dir("C:/Users/savan/OneDrive/Desktop/NSF PSU REU/Thermal Sensitivity/Thermal-Sensitivity/data/airTemp/2021")
+# Define the years and the summer date range: July 1, 2021 - Aug 31, 2021
+yr <- 2021
+start_day <- "-07-01"
+end_day   <- "-08-31"
+# Download daily mean air temperature rasters from PRISM
+get_prism_dailys(type = "tmean", minDate = paste0(yr, start_day), maxDate = paste0(yr, end_day), keepZip = FALSE)
+
+# Checking
+# List all downloaded PRISM files
+prism_files <- prism_archive_ls()
+length(prism_files)
+pd_get_name(prism_files) # July 1, 2021 - Aug 31, 2021 Mean temperature
+
+# Get absolute paths of mean temperature files
+tmean_files <- pd_to_file(prism_files)
+# Load the selected rasters into a single raster stack (one layer per day)
+tmean_stack <- rast(tmean_files)
+
+#
+# Prepare site table using coordinates2021
+site_table <- coordinates2021 %>%
+    rename(site = siteID)
+# Convert this table to a spatial object (SpatVector) with WGS84 coordinates (to match PRISM)
+site_points <- vect(site_table, geom = c("lon", "lat"), crs = "EPSG:4326")
+# Checking
+head(site_table)
+nrow(site_table) # 73 unique sites
+class(site_points) # SpatVector
+crs(site_points) # WGS84 coordinates to match PRISM
+
+# Extract the daily temperature values for each site location from the raster stack
+# Each row corresponds to a site; each column (after the first) is a daily value
+tmean_vals <- terra::extract(tmean_stack, site_points)
+
+# Checking
+dim(tmean_vals) # 73 x 63 = sites x ID 62 days
+head(tmean_vals[, 1:5])
+
+# Combine the extracted temperature values with the site names from the original table
+# Drop the ID column returned by extract() and add site names
+result <- cbind(site = site_table$site, tmean_vals[, -1])
+
+# Rename the temperature columns using just the date portion from each raster layer name
+# This makes the column names easier to read (e.g., "20230601" instead of full PRISM name)
+dates <- substr(names(tmean_stack), start = 26, stop = 33)
+colnames(result)[-1] <- dates
+substr(names(tmean_stack)[1:3], start=26, stop =33)
+# Reshape to long format for analysis or plotting, also format dates
+long_result <- pivot_longer(result, -site, names_to = "date", values_to = "tmean_C")
+long_result$date <- as.Date(long_result$date, format = "%Y%m%d") 

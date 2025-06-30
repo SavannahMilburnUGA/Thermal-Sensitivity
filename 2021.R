@@ -83,6 +83,7 @@ CRBStreamTemperatureMMM2021
 nrow(CRBStreamTemperatureMMM2021) # 12953
 # Save CRB 2021 stream temperature data frame
 saveRDS(CRBStreamTemperatureMMM2021, "CRBDailyStreamTemps2021.rds")
+write_csv(CRBStreamTemperatureMMM2021, "CRBStreamTemperatureMMM2021.csv")
 
 # Finding unique sites for CRB 2021 Data
 uniqueSiteIDs <- unique(CRBStreamTemperatureMMM2021$siteID)
@@ -134,6 +135,9 @@ AREMPStreamTemperatureMMM2021
 nrow(AREMPStreamTemperatureMMM2021) # 365
 # Save 1 AREMP 2021 stream temperature data frame
 saveRDS(AREMPStreamTemperatureMMM2021, "AREMPDailyStreamTemps2021.rds")
+write_csv(AREMPStreamTemperatureMMM2021, "AREMPStreamTemperatureMMM2021.csv")
+# ------------------------------------------------------------------------------------------------------------------------------------------------
+## Combine CRB and AREMP stream temperature data
 # ------------------------------------------------------------------------------------------------------------------------------------------------
 ## Match coordinates to CRB 2021 sites
 coordinatesFile2021 = "C:/Users/savan/OneDrive/Desktop/NSF PSU REU/Thermal Sensitivity/Thermal-Sensitivity/data/streamTemp/2021/Water temp data logs master 2021.xlsx"

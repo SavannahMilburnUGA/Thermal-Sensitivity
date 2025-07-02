@@ -193,6 +193,7 @@ coordinates2021 <- coordinates2021 %>%
 nrow(coordinates2021) # 73
 coordinates2021
 # Save coordinates2021 file 
+saveRDS(coordinates2021, "coordinates2021.RDS")
 write.csv(coordinates2021, "coordinates2021.csv", row.names=FALSE)
 # ------------------------------------------------------------------------------------------------------------------------------------------------
 ## Extracting 2021 July 1 - Aug 31, 2021 Air Temperature data (daily mean, min, max)

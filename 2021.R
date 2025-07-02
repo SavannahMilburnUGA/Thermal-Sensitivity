@@ -77,10 +77,17 @@ CRBStreamTemperatureMMM2021 <- map_dfr(listOfSites2021, function(df) {
             .groups = 'drop' # Removing grouping of dates after
         )
 }, .id = "siteID") # Adding column for site ID
-
+# Checking rows before filtering to target date range: 7/1/2021 - 8/31/2021
+nrow(CRBStreamTemperatureMMM2021) # 12953
+range(CRBStreamTemperatureMMM2021$date) # Date range before
+# Filter CRBStreamTemperatureMMM2021 to date range
+CRBStreamTemperatureMMM2021 <- CRBStreamTemperatureMMM2021 %>%
+    filter(date >= as.Date("2021-07-01") & date <= as.Date("2021-08-31"))
+# Checking that data was filtered to target date range
+nrow(CRBStreamTemperatureMMM2021) # 4435
+range(CRBStreamTemperatureMMM2021$date) # Should be 7/1/2021 - 8/31/2021
 # Output
 CRBStreamTemperatureMMM2021
-nrow(CRBStreamTemperatureMMM2021) # 12953
 # Save CRB 2021 stream temperature data frame
 saveRDS(CRBStreamTemperatureMMM2021, "CRBDailyStreamTemps2021.rds")
 write_csv(CRBStreamTemperatureMMM2021, "CRBStreamTemperatureMMM2021.csv")
@@ -129,10 +136,18 @@ AREMPStreamTemperatureMMM2021 <- deploy_ORCUB001IN02 %>%
     ) %>%
     rename(date = dateAREMP) %>%
     mutate(siteID = "ORCUB001IN02")
+# Checking rows before filtering to target date range: 7/1/2021 - 8/31/2021
+nrow(AREMPStreamTemperatureMMM2021) # 365
+range(AREMPStreamTemperatureMMM2021$date) # Date range before
+# Filter AREMPStreamTemperatureMMM2021 to date range
+AREMPStreamTemperatureMMM2021 <- AREMPStreamTemperatureMMM2021 %>%
+    filter(date >= as.Date("2021-07-01") & date <= as.Date("2021-08-31"))
+# Checking that data was filtered to target date range
+nrow(AREMPStreamTemperatureMMM2021) # 62
+range(AREMPStreamTemperatureMMM2021$date) # Should be 7/1/2021 - 8/31/2021
 
 # Output
 AREMPStreamTemperatureMMM2021
-nrow(AREMPStreamTemperatureMMM2021) # 365
 # Save 1 AREMP 2021 stream temperature data frame
 saveRDS(AREMPStreamTemperatureMMM2021, "AREMPDailyStreamTemps2021.rds")
 write_csv(AREMPStreamTemperatureMMM2021, "AREMPStreamTemperatureMMM2021.csv")

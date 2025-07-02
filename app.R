@@ -55,14 +55,14 @@ ui <- fluidPage(
     sidebarLayout(
         sidebarPanel(
             # Add link to raw data?
-            h5("Please click on a site to view air-stream temperature time-series and thermal sensitivity time-series from 7/1/2021 - 8/31/2021"),
+            h5("Please click on a site to view air-stream temperature time-series and thermal sensitivity from 7/1/2021 - 8/31/2021"),
         ),
         # Tabs
         mainPanel(
            tabsetPanel(
              tabPanel("Map of Sites", leafletOutput("siteMap")),
              tabPanel("Air-Stream Temperature Time-Series", plotlyOutput("tempGraphs")),
-             tabPanel("Thermal Sensitivity Time-Series", plotlyOutput("thermalSensitivity"))
+             tabPanel("Thermal Sensitivity", plotlyOutput("thermalSensitivity"))
            )
         )
     )
@@ -121,8 +121,7 @@ server <- function(input, output) {
             graphAS <- plot_ly() %>%
                 add_text(x = 0.5, y = 0.5, text = "Please click a site on the map to view air-stream temperature time-series.",
                         showlegend = FALSE) %>%
-                layout(xaxis = list(showgrid = FALSE, showticklabels = FALSE, title = ""),
-                       yaxis = list(showgrid = FALSE, showticklabels = FALSE, title = ""))
+                layout(xaxis = list(visible = FALSE), yaxis = list(visible = FALSE), plot_bgcolor = "#e5ecf6", paper_bgcolor = "#e5ecf6")
         } else {
             # Site was clicked on map:
             # Assign site data from reactive function filtering to clicked site
@@ -159,7 +158,7 @@ server <- function(input, output) {
                         legend = list(x = 1.1, y = 0.5, font = list(color = "black", size = 12, family = "Archivo, Arial, san-serif")),
                         plot_bgcolor = "#e5ecf6",
                         paper_bgcolor = "#e5ecf6",
-                        font = list(family = "Archivo, Arial, san-serif", color = "black", size = 12), 
+                        font = list(family = "Archivo, Arial, sans-serif", color = "black", size = 12), 
                         hoverdistance = 20, 
                         spikedistance = -1
                     )
@@ -170,24 +169,51 @@ server <- function(input, output) {
     })
     
     # Building tab that produces thermal sensitivity time-series
-    # Includes range slider too
     output$thermalSensitivity <- renderPlotly({
         # Check if site was clicked on map
         if(is.null(input$siteMap_marker_click)) {
             graphTS <- plot_ly() %>%
-                add_text(x = 0.5, y = 0.5, text = "Please click a site on the map to view thermal sensitivity time-series.",
+                add_text(x = 0.5, y = 0.5, text = "Please click a site on the map to view air-stream temperature time-series.",
                         showlegend = FALSE) %>%
-                layout(xaxis = list(showgrid = FALSE, showticklabels = FALSE, title = ""),
-                       yaxis = list(showgrid = FALSE, showticklabels = FALSE, title = ""))
+                layout(xaxis = list(visible = FALSE), yaxis = list(visible = FALSE), plot_bgcolor = "#e5ecf6", paper_bgcolor = "#e5ecf6")
         } else {
-            # Site was clicked on map: 
+            # Site was clicked on map:
+            # Assign site data from reactive function filtering to clicked site
             clickedSite <- input$siteMap_marker_click$id
-            graphTS <- plot_ly() %>%
-                add_text(x = 0.5, y = 0.5, text = paste("Thermal sensitivity for:", clickedSite),
-                        showlegend = FALSE) %>%
-                layout(title = paste("Thermal Sensitivity for", clickedSite))
+            # Calling reactive function
+            clickedSiteData <- siteChoiceData()
+            
+            # No data available for clicked site
+            if(nrow(clickedSiteData) == 0) {
+                graphTS <- plot_ly() %>%
+                    add_text(x = 0.5, y = 0.5, text = paste("No air-stream temperature data available for site.", clickedSite),
+                            showlegend = FALSE)
+            # Plot thermal sensitivity time series 
+            } else {
+                # Calculate linear regression
+                linReg <- lm(dailyMeanST ~ tmean_C, data = clickedSiteData)
+                slopeTS <- round(coef(linReg)[2], 3)
+
+                graphTS <- plot_ly(clickedSiteData, x = ~tmean_C, y = ~dailyMeanST) %>%
+                    add_markers(color = I("#636efa"), size = I(8), name = "Daily Values") %>%
+                        add_lines(x = ~tmean_C, y = ~fitted(linReg), 
+                         line = list(color = "#fea15b", width = 2), 
+                         name = paste("Thermal Sensitivity =", slopeTS)) %>%
+                    layout(
+                        title = paste("Thermal Sensitivity for Site", clickedSite),
+                        xaxis = list(title = "Mean Air Temperature (°C)"),
+                        yaxis = list(title = "Mean Stream Temperature (°C)"),
+                        hovermode = "closest",
+                        legend = list(x = 1.1, y = 0.5, font = list(color = "black", size = 12, family = "Archivo, Arial, san-serif")),
+                        plot_bgcolor = "#e5ecf6",
+                        paper_bgcolor = "#e5ecf6",
+                        font = list(family = "Archivo, Arial, sans-serif", color = "black", size = 12), 
+                        hoverdistance = 20, 
+                        spikedistance = -1
+                    )
+            }
         }
-        # Output time-series for thermal sensitivity 
+        # Output regression for thermal sensitivity  
         graphTS
     })
 }

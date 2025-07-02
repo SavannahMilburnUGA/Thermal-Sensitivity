@@ -88,6 +88,14 @@ nrow(CRBStreamTemperatureMMM2021) # 4435
 range(CRBStreamTemperatureMMM2021$date) # Should be 7/1/2021 - 8/31/2021
 # Output
 CRBStreamTemperatureMMM2021
+# Changing USGS siteIDs in CRBStreamTemperatureMMM2021 to match airTemperature2021 USGS sites
+CRBStreamTemperatureMMM2021 <- CRBStreamTemperatureMMM2021 %>%
+    mutate(siteID = case_when(
+        siteID == "Clackamas.Temperatures.USGS.202" ~ "USGS 1",
+        siteID == "Clackamas.Temperatures.USGS (2)" ~ "USGS 2", 
+        siteID == "Clackamas.Temperatures.USGS (4)" ~ "USGS 4",
+        TRUE ~ siteID # Keep other siteIDs same
+    ))
 # Save CRB 2021 stream temperature data frame
 saveRDS(CRBStreamTemperatureMMM2021, "CRBDailyStreamTemps2021.rds")
 write_csv(CRBStreamTemperatureMMM2021, "CRBStreamTemperatureMMM2021.csv")
@@ -148,6 +156,9 @@ range(AREMPStreamTemperatureMMM2021$date) # Should be 7/1/2021 - 8/31/2021
 
 # Output
 AREMPStreamTemperatureMMM2021
+# Moving siteID column in AREMPStreamTemperatureMMM2021 from end to first
+AREMPStreamTemperatureMMM2021 <- AREMPStreamTemperatureMMM2021 %>%
+    select(siteID, everything())
 # Save 1 AREMP 2021 stream temperature data frame
 saveRDS(AREMPStreamTemperatureMMM2021, "AREMPDailyStreamTemps2021.rds")
 write_csv(AREMPStreamTemperatureMMM2021, "AREMPStreamTemperatureMMM2021.csv")
@@ -351,3 +362,52 @@ saveRDS(tmin_long_result, "tmin_long_result.rds")
 write_csv(tmin_long_result, "tmin_long_result.csv")
 saveRDS(tmax_long_result, "tmax_long_result.rds")
 write_csv(tmax_long_result, "tmax_long_result.csv")
+# ------------------------------------------------------------------------------------------------------------------------------------------------
+## Calculating thermal sensitivities for each of the 73 sites
+library(broom)
+# Create empty data frame
+thermalSensitivities2021 <- data.frame()
+# Get all 73 site IDs
+allSites <- coordinates2021$siteID
+
+# Iterate through 73 sites to get daily mean stream and air temperatures - calculate thermal sensitivities 
+for (siteN in allSites) {
+    # Determine if site is the 1 AREMP site or 1 of 72 CRB sites
+    if (siteN %in% AREMPStreamTemperatureMMM2021$siteID) {
+        siteStreamData <- AREMPStreamTemperatureMMM2021 %>% filter(siteID == siteN) %>%
+        select(date, dailyMeanST)
+    } else {
+        siteStreamData <- CRBStreamTemperatureMMM2021 %>% filter(siteID == siteN) %>%
+        select(date, dailyMeanST)
+    }
+    # Get daily mean air temperature for this stie
+    siteAirData <- airTemperature2021 %>%
+        filter(site == siteN) %>%
+        select(date, tmean_C)
+    # Combine daily mean stream and air temperature data for site
+    siteMeanData <- siteStreamData %>%
+        inner_join(siteAirData, by = "date") %>%
+        filter(!is.na(dailyMeanST) & !is.na(tmean_C))
+    # Regress mean air temperature & mean stream temperature
+    linModel <- lm(dailyMeanST ~ tmean_C, data = siteMeanData)
+    # Find summary statistics
+    modelGlance <- glance(linModel)
+    modelTidy <- tidy(linModel)
+    thermalSensitivity <- modelTidy$estimate[2]
+    intercept <- modelTidy$estimate[1]
+    rSquared <- modelGlance$r.squared
+    adjRSquared <- modelGlance$adj.r.squared
+    rmse <- sqrt(modelGlance$deviance / modelGlance$df.residual)
+    meanStreamTemp <- mean(siteMeanData$dailyMeanST, na.rm = TRUE)
+    meanAirTemp <- mean(siteMeanData$tmean_C, na.rm = TRUE)
+    # Create row to add to overall data frame for site
+    siteRow <- data.frame(site = siteN, thermalSensitivity = round(thermalSensitivity, 3), intercept = round(intercept, 3), rSquared = round(rSquared, 3), adjRSquared = round(adjRSquared, 3), rmse = round(rmse, 3), meanStreamTemp = round(meanStreamTemp, 3), meanAirTemp = round(meanAirTemp, 3))
+    # Add row to overall thermal sensitivity data frame
+    thermalSensitivities2021 <- rbind(thermalSensitivities2021, siteRow)
+}
+# Checking
+nrow(thermalSensitivities2021) #73
+View(thermalSensitivities2021)
+# Saving thermal sensitivites for 2021 73 sites
+saveRDS(thermalSensitivities2021, "thermalSensitivities2021.RDS")
+write_csv(thermalSensitivities2021, "thermalSensitivities2021.csv")

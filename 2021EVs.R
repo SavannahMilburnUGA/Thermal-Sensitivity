@@ -48,7 +48,11 @@ TSAndEVs <- thermalSensitivities2021 %>%
   left_join(ClackEVs2021, by = c("site" = "Filename")) %>%
   filter(!is.na(thermalSensitivity))
 # Check 
-nrow(TSAndEVs)
+nrow(TSAndEVs) # 73
+# Save TSAndEVs file 
+saveRDS(TSAndEVs, "TSAndEVs.RDS")
+write.csv(TSAndEVs, "TSAndEVs.csv", row.names=FALSE)
+
 
 # Define EVs/landscape variables from Michael 
 # Separated based on scales too: upstream, catchment, buffer
@@ -121,10 +125,6 @@ cat("\nAfter cleaning:\n")
 cat("Variables retained:", ncol(corrDataClean), "\n")
 cat("Sites with complete data:", nrow(corrDataClean), "\n")
 
-# Save cleaned dataset for future analysis
-write.csv(corrDataClean, "cleaned_thermal_sensitivity_dataset.csv", row.names = FALSE)
-cat("Saved cleaned dataset to CSV file\n")
-
 # Save data quality summary
 data_quality_summary <- data.frame(
   metric = c("Original sites", "Sites after removing unwanted", "Sites with complete data", 
@@ -164,11 +164,9 @@ pValues <- corrMatrix$P
 
 # Save full correlation matrix as CSV (NOW that they exist)
 write.csv(corrCoef, "full_correlation_matrix.csv", row.names = TRUE)
-cat("Saved full correlation matrix to CSV file\n")
+saveRDS(corrCoef, "fullCorrelationMatrix.RDS")
 
-# Save p-values matrix as CSV  
-write.csv(pValues, "correlation_pvalues_matrix.csv", row.names = TRUE)
-cat("Saved p-values matrix to CSV file\n")
+cat("Saved full correlation matrix to CSV file\n")
 
 # Focus on thermal sensitivity correlations
 TSCorrCoeff <- corrCoef["thermalSensitivity", ]
@@ -249,23 +247,6 @@ pValues_clean <- pValues
 
 cat("Correlation matrix dimensions:", dim(corrCoef_clean), "\n")
 
-# Visualization 1: correlation heatmap
-png("spearman_correlation_matrix.png", width = 14, height = 12, units = "in", res = 300)
-corrplot(corrCoef_clean,
-         method = "color",
-         type = "upper",
-         order = "hclust", 
-         tl.cex = 0.6,
-         tl.col = "black",
-         tl.srt = 45,
-         p.mat = pValues_clean,
-         sig.level = 0.05,
-         insig = "blank",
-         title = "Spearman Correlations (only p < 0.05 shown)",
-         mar = c(0,0,2,0),
-         col = colorRampPalette(c("blue", "white", "red"))(200))
-dev.off()
-cat("Created correlation matrix plot\n")
 
 # Visualization 2: Thermal sensitivity specific correlations
 strong_corr <- thermal_results %>%
@@ -296,87 +277,9 @@ if(nrow(strong_corr) > 0) {
   cat("No correlations > |0.3| found for separate plot\n")
 }
 
-# Visualization 3: Scatterplots of strongest correlations
-top_3_vars <- head(thermal_results, 3)$variable
-
-if(length(top_3_vars) >= 2) {
-  png("correlation_scatterplots.png", width = 15, height = 5, units = "in", res = 300)
-  par(mfrow = c(1, 3))
-  
-  for(i in 1:min(3, length(top_3_vars))) {
-    var_name <- top_3_vars[i]
-    corr_val <- thermal_results[thermal_results$variable == var_name, "correlation"]
-    p_val <- thermal_results[thermal_results$variable == var_name, "p_value"]
-    
-    plot(corrDataClean[[var_name]],
-         corrDataClean$thermalSensitivity,
-         xlab = var_name,
-         ylab = "Thermal Sensitivity", 
-         main = paste0("r = ", round(corr_val, 3), 
-                      ", p = ", format(p_val, digits = 3)),
-         pch = 16, col = "blue")
-    
-    # Add trend line
-    abline(lm(corrDataClean$thermalSensitivity ~ 
-              corrDataClean[[var_name]]), col = "red", lwd = 2)
-  }
-  
-  par(mfrow = c(1, 1))
-  dev.off()
-  cat("Created scatterplots of top 3 correlations\n")
-}
-
-# Visualization 4: Distribution and boxplots
-png("thermal_sensitivity_distribution.png", width = 10, height = 6, units = "in", res = 300)
-par(mfrow = c(1, 2))
-
-# Histogram
-hist(corrDataClean$thermalSensitivity, 
-     main = "Distribution of Thermal Sensitivity",
-     xlab = "Thermal Sensitivity",
-     col = "lightblue",
-     breaks = 15)
-
-# Boxplot by quartiles of strongest predictor
-strongest_var <- thermal_results$variable[1]
-quartiles <- cut(corrDataClean[[strongest_var]], 
-                breaks = quantile(corrDataClean[[strongest_var]], na.rm = TRUE),
-                include.lowest = TRUE,
-                labels = c("Q1", "Q2", "Q3", "Q4"))
-
-boxplot(corrDataClean$thermalSensitivity ~ quartiles,
-        main = paste("Thermal Sensitivity by", strongest_var, "Quartiles"),
-        xlab = paste(strongest_var, "Quartiles"),
-        ylab = "Thermal Sensitivity",
-        col = c("lightcoral", "lightblue", "lightgreen", "lightyellow"))
-
-par(mfrow = c(1, 1))
-dev.off()
-cat("Created thermal sensitivity distribution plots\n")
 
 # SUMMARY OUTPUT
 # ==============
-
-cat("\n=== SUMMARY ===\n")
-cat("Dataset: ", nrow(corrDataClean), " sites, ",
-    ncol(corrDataClean)-1, " landscape variables\n")
-
-significant_corr <- thermal_results %>% filter(p_value < 0.05)
-cat("Significant correlations (p < 0.05):", nrow(significant_corr), "\n")
-
-strong_significant <- thermal_results %>% filter(p_value < 0.05 & abs_correlation > 0.3)
-cat("Strong significant correlations (|r| > 0.3, p < 0.05):", nrow(strong_significant), "\n")
-
-if(nrow(strong_significant) > 0) {
-  cat("\nStrongest significant relationships:\n")
-  print(strong_significant[1:min(5, nrow(strong_significant)), 
-                          c("variable", "correlation", "p_value", "significance")], 
-        row.names = FALSE)
-  
-  # Save strong significant correlations
-  write.csv(strong_significant, "strong_significant_correlations.csv", row.names = FALSE)
-  cat("Saved strong significant correlations to CSV file\n")
-}
 
 # Create comprehensive summary table
 summary_stats <- data.frame(
@@ -395,26 +298,3 @@ summary_stats <- data.frame(
 )
 write.csv(summary_stats, "correlation_analysis_summary.csv", row.names = FALSE)
 cat("Saved correlation analysis summary to CSV file\n")
-
-cat("\nGenerated files:\n")
-cat("=== CSV FILES ===\n")
-cat("- thermal_sensitivity_correlations.csv: All correlations with thermal sensitivity\n")
-cat("- cleaned_thermal_sensitivity_dataset.csv: Final dataset used for analysis\n") 
-cat("- full_correlation_matrix.csv: Complete correlation matrix (all variables)\n")
-cat("- correlation_pvalues_matrix.csv: P-values for all correlations\n")
-cat("- data_quality_summary.csv: Data cleaning and sample size summary\n")
-cat("- strong_significant_correlations.csv: Key relationships (|r| > 0.3, p < 0.05)\n")
-cat("- correlation_analysis_summary.csv: Overall analysis statistics\n")
-
-cat("\n=== PNG FILES ===\n")
-cat("- spearman_correlation_matrix.png: Full correlation heatmap\n")
-if(nrow(strong_corr) > 0) {
-  cat("- thermal_sensitivity_correlations.png: Strong correlations barplot\n")
-}
-if(length(top_3_vars) >= 2) {
-  cat("- correlation_scatterplots.png: Scatterplots of top 3 relationships\n")
-}
-cat("- thermal_sensitivity_distribution.png: Distribution and boxplots\n")
-
-cat("\n=== VERIFICATION COMPLETE ===\n")
-cat("Spearman correlation analysis verified using multiple methods\n")

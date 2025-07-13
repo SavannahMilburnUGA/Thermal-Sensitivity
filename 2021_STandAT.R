@@ -1,6 +1,4 @@
-# Getting stream temperature & air temperature values for 72 from CRB + 1 AREMP site 
-# Details for 2021 CRB Data found in 2021 branch
-# Details for 2021 AREMP Data found in 2021AREMP branch 
+## Getting stream temperature & air temperature values for 72 sites from CRB + 1 AREMP site 
 
 # Clean house & remove saved files (keeping it clean)
 # Remove all objects in workspace 
@@ -8,7 +6,7 @@ rm(list = ls())
 # Close old plots
 while (!is.null(dev.list())) dev.off()
 
-# Data frame formats are - for combining after PRISM values gotten
+# Data frame formats are - for combining after PRISM values downloaded
 # CRB: Logger - Series # - Date - Time - Temp, C 
 # AREMP: deploy - date - Year - time - tempC
 
@@ -96,9 +94,9 @@ CRBStreamTemperatureMMM2021 <- CRBStreamTemperatureMMM2021 %>%
         siteID == "Clackamas.Temperatures.USGS (4)" ~ "USGS 4",
         TRUE ~ siteID # Keep other siteIDs same
     ))
-# Save CRB 2021 stream temperature data frame
-saveRDS(CRBStreamTemperatureMMM2021, "CRBDailyStreamTemps2021.rds")
-write_csv(CRBStreamTemperatureMMM2021, "CRBStreamTemperatureMMM2021.csv")
+# Save CRB 2021 stream temperature data frame: RDS & csv
+saveRDS(CRBStreamTemperatureMMM2021, "results/2021/RDS/CRBStreamTemperatureMMM2021.RDS")
+write_csv(CRBStreamTemperatureMMM2021, "results/2021/CRBStreamTemperatureMMM2021.csv")
 
 # Finding unique sites for CRB 2021 Data
 uniqueSiteIDs <- unique(CRBStreamTemperatureMMM2021$siteID)
@@ -159,9 +157,9 @@ AREMPStreamTemperatureMMM2021
 # Moving siteID column in AREMPStreamTemperatureMMM2021 from end to first
 AREMPStreamTemperatureMMM2021 <- AREMPStreamTemperatureMMM2021 %>%
     select(siteID, everything())
-# Save 1 AREMP 2021 stream temperature data frame
-saveRDS(AREMPStreamTemperatureMMM2021, "AREMPDailyStreamTemps2021.rds")
-write_csv(AREMPStreamTemperatureMMM2021, "AREMPStreamTemperatureMMM2021.csv")
+# Save 1 AREMP 2021 stream temperature data frame: RDS & csv
+saveRDS(AREMPStreamTemperatureMMM2021, "results/2021/RDS/AREMPStreamTemperatureMMM2021.RDS")
+write_csv(AREMPStreamTemperatureMMM2021, "results/2021/AREMPStreamTemperatureMMM2021.csv")
 # ------------------------------------------------------------------------------------------------------------------------------------------------
 ## Combine CRB and AREMP stream temperature data
 # ------------------------------------------------------------------------------------------------------------------------------------------------
@@ -203,9 +201,9 @@ coordinates2021 <- coordinates2021 %>%
 # Checking
 nrow(coordinates2021) # 73
 coordinates2021
-# Save coordinates2021 file 
-saveRDS(coordinates2021, "coordinates2021.RDS")
-write.csv(coordinates2021, "coordinates2021.csv", row.names=FALSE)
+# Save coordinates2021 file: RDS & csv
+saveRDS(coordinates2021, "results/2021/RDS/coordinates2021.RDS")
+write.csv(coordinates2021, "results/2021/coordinates2021.csv", row.names=FALSE)
 # ------------------------------------------------------------------------------------------------------------------------------------------------
 ## Extracting 2021 July 1 - Aug 31, 2021 Air Temperature data (daily mean, min, max)
 # Load necessary packages
@@ -352,14 +350,14 @@ ncol(airTemperature2021) # Should be 5 columns (site, date, tmean_C, tmin_C, tma
 range(airTemperature2021$date) # 7/1/2021 - 8/31/2021
 # ------------------------------------------------------------------------------------------------------------------------------------------------
 ## Saving PRISM results
-# Saving combined daily tmean, tmin, tmax air temperature data
-saveRDS(airTemperature2021, "airTemperature2021.rds")
-write_csv(airTemperature2021, "airTemperature2021.csv")
-# Saving tmean, tmin, tmax air temperature datasets individually
-saveRDS(tmean_long_result, "tmean_long_result.rds")
-write_csv(tmean_long_result, "tmean_long_result.csv")
-saveRDS(tmin_long_result, "tmin_long_result.rds")
-write_csv(tmin_long_result, "tmin_long_result.csv")
-saveRDS(tmax_long_result, "tmax_long_result.rds")
-write_csv(tmax_long_result, "tmax_long_result.csv")
+# Saving combined daily tmean, tmin, tmax air temperature data: RDS & csv
+saveRDS(airTemperature2021, "results/2021/RDS/airTemperature2021.RDS")
+write_csv(airTemperature2021, "results/2021/airTemperature2021.csv")
+# Saving tmean, tmin, tmax air temperature datasets individually: RDS & csv
+saveRDS(tmean_long_result, "results/2021/RDS/PRISM/tmean_long_result.RDS")
+write_csv(tmean_long_result, "results/2021/PRISM/tmean_long_result.csv")
+saveRDS(tmin_long_result, "results/2021/RDS/PRISM/tmin_long_result.RDS")
+write_csv(tmin_long_result, "results/2021/PRISM/tmin_long_result.csv")
+saveRDS(tmax_long_result, "results/2021/RDS/PRISM/tmax_long_result.RDS")
+write_csv(tmax_long_result, "results/2021/PRISM/tmax_long_result.csv")
 # ------------------------------------------------------------------------------------------------------------------------------------------------

@@ -1,11 +1,18 @@
 ## Calculating thermal sensitivities for each of the 73 sites
+
+# Clean house & remove saved files (keeping it clean)
+# Remove all objects in workspace 
+rm(list = ls())
+# Close old plots
+while (!is.null(dev.list())) dev.off()
+
 library(broom)
 library(tidyverse)
 # Loading RDS structures - using R in VS Code is finnicky
-AREMPStreamTemperatureMMM2021 <- readRDS("AREMPDailyStreamTemps2021.rds")
-CRBStreamTemperatureMMM2021 <- readRDS("CRBDailyStreamTemps2021.rds")
-airTemperature2021 <- readRDS("airTemperature2021.rds")
-coordinates2021 <- readRDS("coordinates2021.rds")
+AREMPStreamTemperatureMMM2021 <- readRDS("results/2021/RDS/AREMPStreamTemperatureMMM2021.RDS")
+CRBStreamTemperatureMMM2021 <- readRDS("results/2021/RDS/CRBStreamTemperatureMMM2021.RDS")
+airTemperature2021 <- readRDS("results/2021/RDS/airTemperature2021.rds")
+coordinates2021 <- readRDS("results/2021/RDS/coordinates2021.rds")
 # Create empty data frame
 thermalSensitivities2021 <- data.frame()
 # Get all 73 site IDs
@@ -64,5 +71,5 @@ nrow(thermalSensitivities2021) #73
 View(thermalSensitivities2021)
 
 # Saving thermal sensitivites for 2021 73 sites
-saveRDS(thermalSensitivities2021, "thermalSensitivities2021.RDS")
-write_csv(thermalSensitivities2021, "thermalSensitivities2021.csv")
+saveRDS(thermalSensitivities2021, "results/2021/RDS/thermalSensitivities2021.RDS")
+write_csv(thermalSensitivities2021, "results/2021/thermalSensitivities2021.csv")

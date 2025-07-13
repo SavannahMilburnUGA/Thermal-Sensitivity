@@ -198,4 +198,3 @@ dev.off()
 shapiro.test(residuals(model5))  # Normality test
 summary(model5)$r.squared  # Check R²
 summary(model5)$adj.r.squared  # Check adjusted R²
-

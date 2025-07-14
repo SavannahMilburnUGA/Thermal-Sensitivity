@@ -97,8 +97,13 @@ View(TSandAllEVsData)
 fullCorrMatrix <- rcorr(as.matrix(TSandAllEVsData), type = "spearman")
 # Save fullCorrMatrix of all 40 landscape EVs + thermal sensitivity, mean air temperature, mean stream temperature: RDS & csv
 saveRDS(fullCorrMatrix, "results/2021/correlation/RDS/fullCorrMatrix.RDS")
+# Save correlation matrix as CSV with names in first column
+fullCorrMatrixDF <- as.data.frame(fullCorrMatrix$r)
+fullCorrMatrixDF$LandscapeEV <- rownames(fullCorrMatrixDF)
+fullCorrMatrixDF <- fullCorrMatrixDF[, c("Variable", setdiff(names(fullCorrMatrixDF), "LandscapeEV"))]
 # Correlation coefficients
-write_csv(as.data.frame(fullCorrMatrix$r), "results/2021/correlation/coefficients/fullCorrMatrixCoeffs.csv")
+fullCorrMatrix <- fullCorrMatrix
+write_csv(fullCorrMatrixDF, "results/2021/correlation/coefficients/fullCorrMatrixCoeffs.csv")
 # p-values
 write_csv(as.data.frame(fullCorrMatrix$P), "results/2021/correlation/pvalues/fullCorrMatrixPVals.csv")
 

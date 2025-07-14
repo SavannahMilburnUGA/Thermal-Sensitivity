@@ -104,8 +104,12 @@ fullCorrMatrixDF$Variable <- rownames(fullCorrMatrixDF)
 fullCorrMatrixDF <- fullCorrMatrixDF[, c("Variable", setdiff(names(fullCorrMatrixDF), "Variable"))]
 # Correlation coefficients
 write_csv(fullCorrMatrixDF, "results/2021/correlation/coefficients/fullCorrMatrixCoeffs.csv")
+# Save correlation matrix as CSV with names in first column
+fullCorrMatrixPVals <- as.data.frame(fullCorrMatrix$P)
+fullCorrMatrixPVals$Variable <- rownames(fullCorrMatrixPVals)
+fullCorrMatrixPVals <- fullCorrMatrixPVals[, c("Variable", setdiff(names(fullCorrMatrixPVals), "Variable"))]
 # P values
-write_csv(as.data.frame(fullCorrMatrix$P), "results/2021/correlation/pvalues/fullCorrMatrixPVals.csv")
+write_csv(fullCorrMatrixPVals, "results/2021/correlation/pvalues/fullCorrMatrixPVals.csv")
 #--------------------------------------------------------------------------------------------------------------------------------------------------
 ### EVs2021NHD + RVsTS2021
 ## Create NHD correlation matrix dataset - 4 landscape variables + thermal sensitivity, mean air temperature, mean stream temperature
@@ -124,8 +128,12 @@ NHDCorrMatrixDF$Variable <- rownames(NHDCorrMatrixDF)
 NHDCorrMatrixDF <- NHDCorrMatrixDF[, c("Variable", setdiff(names(NHDCorrMatrixDF), "Variable"))]
 # Correlation coefficients
 write_csv(NHDCorrMatrixDF, "results/2021/correlation/coefficients/NHDCorrMatrixCoeffs.csv")
+# Save correlation matrix as CSV with names in first column
+NHDCorrMatrixPVals <- as.data.frame(NHDCorrMatrix$P)
+NHDCorrMatrixPVals$Variable <- rownames(NHDCorrMatrixPVals)
+NHDCorrMatrixPVals <- NHDCorrMatrixPVals[, c("Variable", setdiff(names(NHDCorrMatrixPVals), "Variable"))]
 # P values
-write_csv(as.data.frame(NHDCorrMatrix$P), "results/2021/correlation/pvalues/NHDCorrMatrixPVals.csv")
+write_csv(NHDCorrMatrixPVals, "results/2021/correlation/pvalues/NHDCorrMatrixPVals.csv")
 #--------------------------------------------------------------------------------------------------------------------------------------------------
 ### EVs2021Upstream + RVsTS2021
 ## Create upstream correlation matrix dataset - 12 h2o landscape variables + thermal sensitivity, mean air temperature, mean stream temperature
@@ -144,8 +152,12 @@ UpstreamCorrMatrixDF$Variable <- rownames(UpstreamCorrMatrixDF)
 UpstreamCorrMatrixDF <- UpstreamCorrMatrixDF[, c("Variable", setdiff(names(UpstreamCorrMatrixDF), "Variable"))]
 # Correlation coefficients
 write_csv(UpstreamCorrMatrixDF, "results/2021/correlation/coefficients/UpstreamCorrMatrixCoeffs.csv")
+# Save correlation matrix as CSV with names in first column
+UpstreamCorrMatrixPVals <- as.data.frame(UpstreamCorrMatrix$P)
+UpstreamCorrMatrixPVals$Variable <- rownames(UpstreamCorrMatrixPVals)
+UpstreamCorrMatrixPVals <- UpstreamCorrMatrixPVals[, c("Variable", setdiff(names(UpstreamCorrMatrixPVals), "Variable"))]
 # P values
-write_csv(as.data.frame(UpstreamCorrMatrix$P), "results/2021/correlation/pvalues/UpstreamCorrMatrixPVals.csv")
+write_csv(UpstreamCorrMatrixPVals, "results/2021/correlation/pvalues/UpstreamCorrMatrixPVals.csv")
 #---------------------------------------------------------------------------------------------------------------------------------------------------
 ### EVs2021Catchment + RVsTS2021
 ## Create catchment correlation matrix dataset - 9 landscape variables + thermal sensitivity, mean air temperature, mean stream temperature
@@ -164,8 +176,12 @@ CatchmentCorrMatrixDF$Variable <- rownames(CatchmentCorrMatrixDF)
 CatchmentCorrMatrixDF <- CatchmentCorrMatrixDF[, c("Variable", setdiff(names(CatchmentCorrMatrixDF), "Variable"))]
 # Correlation coefficients
 write_csv(CatchmentCorrMatrixDF, "results/2021/correlation/coefficients/CatchmentCorrMatrixCoeffs.csv")
+# Save correlation matrix as CSV with names in first column
+CatchmentCorrMatrixPVals <- as.data.frame(CatchmentCorrMatrix$P)
+CatchmentCorrMatrixPVals$Variable <- rownames(CatchmentCorrMatrixPVals)
+CatchmentCorrMatrixPVals <- CatchmentCorrMatrixPVals[, c("Variable", setdiff(names(CatchmentCorrMatrixPVals), "Variable"))]
 # P values
-write_csv(as.data.frame(CatchmentCorrMatrix$P), "results/2021/correlation/pvalues/CatchmentCorrMatrixPVals.csv")
+write_csv(CatchmentCorrMatrixPVals, "results/2021/correlation/pvalues/CatchmentCorrMatrixPVals.csv")
 #---------------------------------------------------------------------------------------------------------------------------------------------------
 ### EVs2021Buffer + RVsTS2021
 ## Create buffer correlation matrix dataset - 9 landscape variables + thermal sensitivity, mean air temperature, mean stream temperature
@@ -184,8 +200,12 @@ BufferCorrMatrixDF$Variable <- rownames(BufferCorrMatrixDF)
 BufferCorrMatrixDF <- BufferCorrMatrixDF[, c("Variable", setdiff(names(BufferCorrMatrixDF), "Variable"))]
 # Correlation coefficients
 write_csv(BufferCorrMatrixDF, "results/2021/correlation/coefficients/BufferCorrMatrixCoeffs.csv")
+# Save correlation matrix as CSV with names in first column
+BufferCorrMatrixPVals <- as.data.frame(BufferCorrMatrix$P)
+BufferCorrMatrixPVals$Variable <- rownames(BufferCorrMatrixPVals)
+BufferCorrMatrixPVals <- BufferCorrMatrixPVals[, c("Variable", setdiff(names(BufferCorrMatrixPVals), "Variable"))]
 # P values
-write_csv(as.data.frame(BufferCorrMatrix$P), "results/2021/correlation/pvalues/BufferCorrMatrixPVals.csv")
+write_csv(BufferCorrMatrixPVals, "results/2021/correlation/pvalues/BufferCorrMatrixPVals.csv")
 #---------------------------------------------------------------------------------------------------------------------------------------------------
 ### EVs2021Climate + RVsTS2021
 ## Create climate correlation matrix dataset - 6 climate variables + thermal sensitivity, mean air temperature, mean stream temperature
@@ -204,8 +224,12 @@ ClimateCorrMatrixDF$Variable <- rownames(ClimateCorrMatrixDF)
 ClimateCorrMatrixDF <- ClimateCorrMatrixDF[, c("Variable", setdiff(names(ClimateCorrMatrixDF), "Variable"))]
 # Correlation coefficients
 write_csv(ClimateCorrMatrixDF, "results/2021/correlation/coefficients/ClimateCorrMatrixCoeffs.csv")
+# Save correlation matrix as CSV with names in first column
+ClimateCorrMatrixPVals <- as.data.frame(ClimateCorrMatrix$P)
+ClimateCorrMatrixPVals$Variable <- rownames(ClimateCorrMatrixPVals)
+ClimateCorrMatrixPVals <- ClimateCorrMatrixPVals[, c("Variable", setdiff(names(ClimateCorrMatrixPVals), "Variable"))]
 # P values
-write_csv(as.data.frame(ClimateCorrMatrix$P), "results/2021/correlation/pvalues/ClimateCorrMatrixPVals.csv")
+write_csv(ClimateCorrMatrixPVals, "results/2021/correlation/pvalues/ClimateCorrMatrixPVals.csv")
 #---------------------------------------------------------------------------------------------------------------------------------------------------
 library(reshape2)
 ### Creating a function to create informative summary for each correlation matrix
@@ -234,7 +258,12 @@ analyzeCorrMatrix <- function(corrMatrix, outputFile) {
     write_csv(table, outputFile)
     return(table)
 }
-# Run it
+# Run analyzeCorrMatrix on all correlation matrices
+FullInfoSummary <- analyzeCorrMatrix(fullCorrMatrix, "results/2021/correlation/summary/fullInfoSummary.csv")
 NHDInfoSummary <- analyzeCorrMatrix(NHDCorrMatrix, "results/2021/correlation/summary/NHDInfoSummary.csv")
+UpstreamInfoSummary <- analyzeCorrMatrix(UpstreamCorrMatrix, "results/2021/correlation/summary/UpstreamInfoSummary.csv")
+CatchmentInfoSummary <- analyzeCorrMatrix(CatchmentCorrMatrix, "results/2021/correlation/summary/CatchmentInfoSummary.csv")
+BufferInfoSummary <- analyzeCorrMatrix(BufferCorrMatrix, "results/2021/correlation/summary/BufferInfoSummary.csv")
+ClimateInfoSummary <- analyzeCorrMatrix(ClimateCorrMatrix, "results/2021/correlation/summary/ClimateInfoSummary.csv")
 #---------------------------------------------------------------------------------------------------------------------------------------------------
 ### Correlation plots divided based on scale

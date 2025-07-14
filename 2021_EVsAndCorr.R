@@ -125,7 +125,7 @@ NHDCorrMatrixDF <- NHDCorrMatrixDF[, c("Variable", setdiff(names(NHDCorrMatrixDF
 # Correlation coefficients
 write_csv(NHDCorrMatrixDF, "results/2021/correlation/coefficients/NHDCorrMatrixCoeffs.csv")
 # P values
-write_csv(as.data.frame(NHDCorrMatrixDF$P), "results/2021/correlation/pvalues/NHDCorrMatrixPVals.csv")
+write_csv(as.data.frame(NHDCorrMatrix$P), "results/2021/correlation/pvalues/NHDCorrMatrixPVals.csv")
 #--------------------------------------------------------------------------------------------------------------------------------------------------
 ### EVs2021Upstream + RVsTS2021
 ## Create upstream correlation matrix dataset - 12 h2o landscape variables + thermal sensitivity, mean air temperature, mean stream temperature
@@ -145,7 +145,7 @@ UpstreamCorrMatrixDF <- UpstreamCorrMatrixDF[, c("Variable", setdiff(names(Upstr
 # Correlation coefficients
 write_csv(UpstreamCorrMatrixDF, "results/2021/correlation/coefficients/UpstreamCorrMatrixCoeffs.csv")
 # P values
-write_csv(as.data.frame(UpstreamCorrMatrixDF$P), "results/2021/correlation/pvalues/UpstreamCorrMatrixPVals.csv")
+write_csv(as.data.frame(UpstreamCorrMatrix$P), "results/2021/correlation/pvalues/UpstreamCorrMatrixPVals.csv")
 #---------------------------------------------------------------------------------------------------------------------------------------------------
 ### EVs2021Catchment + RVsTS2021
 ## Create catchment correlation matrix dataset - 9 landscape variables + thermal sensitivity, mean air temperature, mean stream temperature
@@ -165,7 +165,7 @@ CatchmentCorrMatrixDF <- CatchmentCorrMatrixDF[, c("Variable", setdiff(names(Cat
 # Correlation coefficients
 write_csv(CatchmentCorrMatrixDF, "results/2021/correlation/coefficients/CatchmentCorrMatrixCoeffs.csv")
 # P values
-write_csv(as.data.frame(CatchmentCorrMatrixDF$P), "results/2021/correlation/pvalues/CatchmentCorrMatrixPVals.csv")
+write_csv(as.data.frame(CatchmentCorrMatrix$P), "results/2021/correlation/pvalues/CatchmentCorrMatrixPVals.csv")
 #---------------------------------------------------------------------------------------------------------------------------------------------------
 ### EVs2021Buffer + RVsTS2021
 ## Create buffer correlation matrix dataset - 9 landscape variables + thermal sensitivity, mean air temperature, mean stream temperature
@@ -185,7 +185,7 @@ BufferCorrMatrixDF <- BufferCorrMatrixDF[, c("Variable", setdiff(names(BufferCor
 # Correlation coefficients
 write_csv(BufferCorrMatrixDF, "results/2021/correlation/coefficients/BufferCorrMatrixCoeffs.csv")
 # P values
-write_csv(as.data.frame(BufferCorrMatrixDF$P), "results/2021/correlation/pvalues/BufferCorrMatrixPVals.csv")
+write_csv(as.data.frame(BufferCorrMatrix$P), "results/2021/correlation/pvalues/BufferCorrMatrixPVals.csv")
 #---------------------------------------------------------------------------------------------------------------------------------------------------
 ### EVs2021Climate + RVsTS2021
 ## Create climate correlation matrix dataset - 6 climate variables + thermal sensitivity, mean air temperature, mean stream temperature
@@ -205,6 +205,36 @@ ClimateCorrMatrixDF <- ClimateCorrMatrixDF[, c("Variable", setdiff(names(Climate
 # Correlation coefficients
 write_csv(ClimateCorrMatrixDF, "results/2021/correlation/coefficients/ClimateCorrMatrixCoeffs.csv")
 # P values
-write_csv(as.data.frame(ClimateCorrMatrixDF$P), "results/2021/correlation/pvalues/ClimateCorrMatrixPVals.csv")
+write_csv(as.data.frame(ClimateCorrMatrix$P), "results/2021/correlation/pvalues/ClimateCorrMatrixPVals.csv")
+#---------------------------------------------------------------------------------------------------------------------------------------------------
+library(reshape2)
+### Creating a function to create informative summary for each correlation matrix
+analyzeCorrMatrix <- function(corrMatrix, outputFile) {
+    # Extract coefficients & p values from correlation matrix
+    coefficients <- corrMatrix$r 
+    pValues <- corrMatrix$P
+    # Reshape data to tall, normal structure
+    coefficientsLong <- melt(coefficients, varnames = c("Variable 1", "Variable 2"), value.name = "Correlation Coefficient")
+    pValuesLong <- melt(pValues, varnames = c("Variable 1", "Variable 2"), value.name = "p Value")
+    # Combine correlation coefficient & p value
+    table <- merge(coefficientsLong, pValuesLong, by = c("Variable 1", "Variable 2")) 
+    # Remove diagonal (self-correlation) 
+    table <- table[table$`Variable 1` != table$`Variable 2`, ]
+    # Remove duplicate - not a pair anymore
+    table <- table[!duplicated(t(apply(table[,1:2], 1, sort))), ] 
+    # Find absolute value of correlation coefficient
+    table$`Absolute Value of Correlation` <- abs(table$`Correlation Coefficient`)
+    # Categorize correlation strength
+    table$`Correlation Strength` <- cut(table$`Absolute Value of Correlation`, breaks = c(0, 0.19, 0.39, 0.59, 0.79, 1.00), labels = c("Very Weak", "Weak", "Moderate", "Strong", "Very Strong"), include.lowest = TRUE)
+    # Find direction of correlation
+    table$Direction <- ifelse(table$`Correlation Coefficient` > 0, "Positive", "Negative")
+    # Sort by highest significance & highest strength
+    table <- table[order(table$`p Value`, -table$`Absolute Value of Correlation`), ]
+    # Save table
+    write_csv(table, outputFile)
+    return(table)
+}
+# Run it
+NHDInfoSummary <- analyzeCorrMatrix(NHDCorrMatrix, "results/2021/correlation/summary/NHDInfoSummary.csv")
 #---------------------------------------------------------------------------------------------------------------------------------------------------
 ### Correlation plots divided based on scale

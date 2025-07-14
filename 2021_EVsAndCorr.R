@@ -33,8 +33,6 @@ ClackEVs2021 <- ClackEVs2021 %>%
     Filename == "CLACKAMAS.TEMPERATURES.USGS.2021 - FISH CREEK" ~ "USGS 4",
     TRUE ~ Filename
   ))
-# Check
-View(ClackEVs2021) # USGS 1-4
 
 # Remove 7 unneeded sites from ClackEVs2021 to make 73 sites 
 remove <- c("10598088", "20733169", "USGS 3", "10361309", "10931479", "11007911", "11007937", "20539817")
@@ -56,7 +54,6 @@ TSAndEVs2021 <- TSAndEVs2021 %>%
     filter(!site == "ORCUB001IN02")
 # Check 
 nrow(TSAndEVs2021) # 72
-View(TSAndEVs2021)
 
 # Save TSAndEVs file - only have 69 sites + 3 USGS sites now (NO 1 AREMP site)
 # Huge spreadsheet Dr. Chang was wanting
@@ -91,8 +88,6 @@ library(psych)
 ## Create full correlation matrix dataset - all 40 landscape variables + thermal sensitivity, mean air temperature, mean stream temperature
 # Join TS RVs and all landscape EVs
 TSandAllEVsData <- TSAndEVs2021[, c(RVsTS2021, EVs2021)]
-# Check
-View(TSandAllEVsData)
 # Compute full correlation matrix using Spearman's 
 fullCorrMatrix <- rcorr(as.matrix(TSandAllEVsData), type = "spearman")
 # Save fullCorrMatrix of all 40 landscape EVs + thermal sensitivity, mean air temperature, mean stream temperature: RDS & csv
@@ -115,8 +110,6 @@ write_csv(fullCorrMatrixPVals, "results/2021/correlation/pvalues/fullCorrMatrixP
 ## Create NHD correlation matrix dataset - 4 landscape variables + thermal sensitivity, mean air temperature, mean stream temperature
 # Join TS RVs and 4 landscape EVs
 TSandNHDEVsData <- TSAndEVs2021[, c(RVsTS2021, EVs2021NHD)]
-# Check
-View(TSandNHDEVsData)
 # Compute NHD correlation matrix using Spearman's 
 NHDCorrMatrix <- rcorr(as.matrix(TSandNHDEVsData), type = "spearman")
 # Save NHDCorrMatrix of 4 landscape EVs + thermal sensitivity, mean air temperature, mean stream temperature: RDS & csv
@@ -139,8 +132,6 @@ write_csv(NHDCorrMatrixPVals, "results/2021/correlation/pvalues/NHDCorrMatrixPVa
 ## Create upstream correlation matrix dataset - 12 h2o landscape variables + thermal sensitivity, mean air temperature, mean stream temperature
 # Join TS RVs and 12 h2o landscape EVs
 TSandUpstreamEVsData <- TSAndEVs2021[, c(RVsTS2021, EVs2021Upstream)]
-# Check
-View(TSandUpstreamEVsData)
 # Compute upstream correlation matrix using Spearman's 
 UpstreamCorrMatrix <- rcorr(as.matrix(TSandUpstreamEVsData), type = "spearman")
 # Save UpstreamCorrMatrix of 12 h2o landscape EVs + thermal sensitivity, mean air temperature, mean stream temperature: RDS & csv
@@ -163,8 +154,6 @@ write_csv(UpstreamCorrMatrixPVals, "results/2021/correlation/pvalues/UpstreamCor
 ## Create catchment correlation matrix dataset - 9 landscape variables + thermal sensitivity, mean air temperature, mean stream temperature
 # Join TS RVs and 9 landscape EVs
 TSandCatchmentEVsData <- TSAndEVs2021[, c(RVsTS2021, EVs2021Catchment)]
-# Check
-View(TSandCatchmentEVsData)
 # Compute catchment correlation matrix using Spearman's 
 CatchmentCorrMatrix <- rcorr(as.matrix(TSandCatchmentEVsData), type = "spearman")
 # Save CatchmentCorrMatrix of 9 landscape EVs + thermal sensitivity, mean air temperature, mean stream temperature: RDS & csv
@@ -187,8 +176,6 @@ write_csv(CatchmentCorrMatrixPVals, "results/2021/correlation/pvalues/CatchmentC
 ## Create buffer correlation matrix dataset - 9 landscape variables + thermal sensitivity, mean air temperature, mean stream temperature
 # Join TS RVs and 9 landscape EVs
 TSandBufferEVsData <- TSAndEVs2021[, c(RVsTS2021, EVs2021Buffer)]
-# Check
-View(TSandBufferEVsData)
 # Compute buffer correlation matrix using Spearman's 
 BufferCorrMatrix <- rcorr(as.matrix(TSandBufferEVsData), type = "spearman")
 # Save BufferCorrMatrix of 9 landscape EVs + thermal sensitivity, mean air temperature, mean stream temperature: RDS & csv
@@ -211,8 +198,6 @@ write_csv(BufferCorrMatrixPVals, "results/2021/correlation/pvalues/BufferCorrMat
 ## Create climate correlation matrix dataset - 6 climate variables + thermal sensitivity, mean air temperature, mean stream temperature
 # Join TS RVs and 6 climate EVs
 TSandClimateEVsData <- TSAndEVs2021[, c(RVsTS2021, EVs2021Climate)]
-# Check
-View(TSandClimateEVsData)
 # Compute climate correlation matrix using Spearman's 
 ClimateCorrMatrix <- rcorr(as.matrix(TSandClimateEVsData), type = "spearman")
 # Save ClimateCorrMatrix of 6 climate EVs + thermal sensitivity, mean air temperature, mean stream temperature: RDS & csv
@@ -265,5 +250,10 @@ UpstreamInfoSummary <- analyzeCorrMatrix(UpstreamCorrMatrix, "results/2021/corre
 CatchmentInfoSummary <- analyzeCorrMatrix(CatchmentCorrMatrix, "results/2021/correlation/summary/CatchmentInfoSummary.csv")
 BufferInfoSummary <- analyzeCorrMatrix(BufferCorrMatrix, "results/2021/correlation/summary/BufferInfoSummary.csv")
 ClimateInfoSummary <- analyzeCorrMatrix(ClimateCorrMatrix, "results/2021/correlation/summary/ClimateInfoSummary.csv")
+#---------------------------------------------------------------------------------------------------------------------------------------------------
+# Filter your full info summary for only thermal sensivity correlations w/ every landscape EV
+TSOnlyInfoSummary <- FullInfoSummary[FullInfoSummary$`Variable 1` == "thermalSensitivity" | FullInfoSummary$`Variable 2` == "thermalSensitivity", ]
+# Save it
+write_csv(TSOnlyInfoSummary, "results/2021/correlation/summary/TSOnlyInfoSummary.csv")
 #---------------------------------------------------------------------------------------------------------------------------------------------------
 ### Correlation plots divided based on scale

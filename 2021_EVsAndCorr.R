@@ -100,12 +100,12 @@ saveRDS(fullCorrMatrix, "results/2021/correlation/RDS/fullCorrMatrix.RDS")
 # Save correlation matrix as CSV with names in first column
 fullCorrMatrixDF <- as.data.frame(fullCorrMatrix$r)
 fullCorrMatrixDF$LandscapeEV <- rownames(fullCorrMatrixDF)
-fullCorrMatrixDF <- fullCorrMatrixDF[, c("Variable", setdiff(names(fullCorrMatrixDF), "LandscapeEV"))]
+fullCorrMatrixDF <- fullCorrMatrixDF[, c("LandscapeEV", setdiff(names(fullCorrMatrixDF), "LandscapeEV"))]
 # Correlation coefficients
-fullCorrMatrix <- fullCorrMatrix
 write_csv(fullCorrMatrixDF, "results/2021/correlation/coefficients/fullCorrMatrixCoeffs.csv")
-# p-values
+# P values
 write_csv(as.data.frame(fullCorrMatrix$P), "results/2021/correlation/pvalues/fullCorrMatrixPVals.csv")
+
 
 ## HERE 
 # alternative is two-sided, confidence level is 95%

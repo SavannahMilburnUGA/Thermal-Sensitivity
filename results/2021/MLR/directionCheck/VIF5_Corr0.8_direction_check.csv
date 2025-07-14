@@ -1,0 +1,3 @@
+Variable,TSCorrelation,CorrelationDirection,StdCoefficient,StdCoefficientDirection,DirectionMatch
+SLOPE,-0.28205644578558814,Negative,-0.19686779238087274,Negative,TRUE
+WetlandsRC,0.21157795842117938,Positive,-0.20619775472174298,Negative,FALSE

@@ -27,7 +27,7 @@ a00.VIFs <- vif(a00.model1)
 print("All landscape variables with VIF values: ")
 print(a00.VIFs)
 # Saving VIF values
-write.csv(data.frame(Variable = names(a00.VIFs), VIF = a00.VIFs), "results/2021/MLR/a00.VIFs.csv")
+write.csv(data.frame(Variable = names(a00.VIFs), VIF = a00.VIFs), "results/2021/MLR/initialModel/a00.VIFs.csv")
 
 # If use VIF > 5: only SLOPE would be included... 
 # If use VIF > 10: only 6 landscape variables
@@ -53,7 +53,7 @@ a00.model2Vars <- c("SLOPE", "Solar", "h2oLakesPe", "h2oRdDens", "h2oHiCascP", "
 a00.model2CorrMatrix <- fullCorrMatrix$r[a00.model2Vars, a00.model2Vars]
 # Look for any correlation coefficients > 0.9 (ignore self-correlations OBVIII)
 View(a00.model2CorrMatrix)
-write.csv(a00.model2CorrMatrix, "results/2021/MLR/a00.model2CorrMatrix.csv")
+write.csv(a00.model2CorrMatrix, "results/2021/MLR/initialModel/a00.model2CorrMatrix.csv")
 # No correlation coefficients > 0.9
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------
@@ -187,14 +187,14 @@ xtable::xtable(a00.model5)
 # Create data frame
 a00.model5Coeff <- as.data.frame(summary(a00.model5)$coefficients)
 # Save to CSV
-write.csv(a00.model5Coeff, "results/2021/MLR/a00.model5Coeff.csv", row.names = TRUE)
+write.csv(a00.model5Coeff, "results/2021/MLR/initialModel/a00.model5Coeff.csv", row.names = TRUE)
 
 
 
 # Checking model5
 # Test model assumptions
 # Residual plots
-png("results/2021/MLR/a00.model4ResidualPlots.png", width = 1200, height = 900)
+png("results/2021/MLR/initialModel/a00.model4ResidualPlots.png", width = 1200, height = 900)
 par(mfrow = c(2,2))  # 2x2 grid
 plot(a00.model5)
 dev.off()

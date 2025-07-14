@@ -1,5 +1,4 @@
-## NEW - Load Michael landscape variables and complete correlation analysis
-## Load Michael landscape variables (EVs)
+## Load Michael landscape variables and complete correlation analysis
 
 ## Clean house & remove saved files 
 # Remove all objects in workspace
@@ -9,7 +8,7 @@ while (!is.null(dev.list())) dev.off()
 
 ## Creating huge spreadsheet of EVs + thermal sensitivities of 72 sites (no 1 AREMP site anymore)
 library(tidyverse)
-
+#--------------------------------------------------------------------------------------------------------------------------------------------------
 # Load thermalSensitivities2021 RDS
 thermalSensitivities2021 <- readRDS("results/2021/RDS/thermalSensitivities2021.RDS")
 # Check
@@ -78,7 +77,7 @@ EVs2021Upstream <- c("h2oDevelop", "h2oLakesPe", "h2oAgricul", "h2oBurnPer", "h2
 EVs2021Catchment <- c("BurnRCA", "AgricultRC", "WetlandsRC", "LakesRCA", "HiCascRCA", "DevelopRCA", "RoadsRCA", "VegCover", "VegHeight_")
 EVs2021Buffer <- c("DevelopBuf", "AgBuf", "BurnBuf", "WetlandBuf", "LakesBuf", "HiCascBuf", "RoadsBuf", "VegHtBuf", "VegCovBuf")
 EVs2021Climate <- c("MeanMaxAir", "MaxAir_C", "Precip_mm", "SumPrecip", "MeanAirJJA", "WetPrecip")
-
+#-------------------------------------------------------------------------------------------------------------------------------------------------
 # Load required libraries
 library(corrplot)
 library(Hmisc) # produces correlation matrix
@@ -87,7 +86,8 @@ library(car)
 library(PerformanceAnalytics) # informative figure
 library(gridExtra)
 library(psych)
-
+# Spearman's correlation analysis: default is alternative is two-sided, confidence level is 95%
+#-------------------------------------------------------------------------------------------------------------------------------------------------
 ## Create full correlation matrix dataset - all 40 landscape variables + thermal sensitivity, mean air temperature, mean stream temperature
 # Join TS RVs and all landscape EVs
 TSandAllEVsData <- TSAndEVs2021[, c(RVsTS2021, EVs2021)]
@@ -97,55 +97,114 @@ View(TSandAllEVsData)
 fullCorrMatrix <- rcorr(as.matrix(TSandAllEVsData), type = "spearman")
 # Save fullCorrMatrix of all 40 landscape EVs + thermal sensitivity, mean air temperature, mean stream temperature: RDS & csv
 saveRDS(fullCorrMatrix, "results/2021/correlation/RDS/fullCorrMatrix.RDS")
+
 # Save correlation matrix as CSV with names in first column
 fullCorrMatrixDF <- as.data.frame(fullCorrMatrix$r)
-fullCorrMatrixDF$LandscapeEV <- rownames(fullCorrMatrixDF)
-fullCorrMatrixDF <- fullCorrMatrixDF[, c("LandscapeEV", setdiff(names(fullCorrMatrixDF), "LandscapeEV"))]
+fullCorrMatrixDF$Variable <- rownames(fullCorrMatrixDF)
+fullCorrMatrixDF <- fullCorrMatrixDF[, c("Variable", setdiff(names(fullCorrMatrixDF), "Variable"))]
 # Correlation coefficients
 write_csv(fullCorrMatrixDF, "results/2021/correlation/coefficients/fullCorrMatrixCoeffs.csv")
 # P values
 write_csv(as.data.frame(fullCorrMatrix$P), "results/2021/correlation/pvalues/fullCorrMatrixPVals.csv")
+#--------------------------------------------------------------------------------------------------------------------------------------------------
+### EVs2021NHD + RVsTS2021
+## Create NHD correlation matrix dataset - 4 landscape variables + thermal sensitivity, mean air temperature, mean stream temperature
+# Join TS RVs and 4 landscape EVs
+TSandNHDEVsData <- TSAndEVs2021[, c(RVsTS2021, EVs2021NHD)]
+# Check
+View(TSandNHDEVsData)
+# Compute NHD correlation matrix using Spearman's 
+NHDCorrMatrix <- rcorr(as.matrix(TSandNHDEVsData), type = "spearman")
+# Save NHDCorrMatrix of 4 landscape EVs + thermal sensitivity, mean air temperature, mean stream temperature: RDS & csv
+saveRDS(NHDCorrMatrix, "results/2021/correlation/RDS/NHDCorrMatrix.RDS")
 
+# Save correlation matrix as CSV with names in first column
+NHDCorrMatrixDF <- as.data.frame(NHDCorrMatrix$r)
+NHDCorrMatrixDF$Variable <- rownames(NHDCorrMatrixDF)
+NHDCorrMatrixDF <- NHDCorrMatrixDF[, c("Variable", setdiff(names(NHDCorrMatrixDF), "Variable"))]
+# Correlation coefficients
+write_csv(NHDCorrMatrixDF, "results/2021/correlation/coefficients/NHDCorrMatrixCoeffs.csv")
+# P values
+write_csv(as.data.frame(NHDCorrMatrixDF$P), "results/2021/correlation/pvalues/NHDCorrMatrixPVals.csv")
+#--------------------------------------------------------------------------------------------------------------------------------------------------
+### EVs2021Upstream + RVsTS2021
+## Create upstream correlation matrix dataset - 12 h2o landscape variables + thermal sensitivity, mean air temperature, mean stream temperature
+# Join TS RVs and 12 h2o landscape EVs
+TSandUpstreamEVsData <- TSAndEVs2021[, c(RVsTS2021, EVs2021Upstream)]
+# Check
+View(TSandUpstreamEVsData)
+# Compute upstream correlation matrix using Spearman's 
+UpstreamCorrMatrix <- rcorr(as.matrix(TSandUpstreamEVsData), type = "spearman")
+# Save UpstreamCorrMatrix of 12 h2o landscape EVs + thermal sensitivity, mean air temperature, mean stream temperature: RDS & csv
+saveRDS(UpstreamCorrMatrix, "results/2021/correlation/RDS/UpstreamCorrMatrix.RDS")
 
-## HERE 
-# alternative is two-sided, confidence level is 95%
-## Generate correlation matrix using Spearman's correlation analysis
+# Save correlation matrix as CSV with names in first column
+UpstreamCorrMatrixDF <- as.data.frame(UpstreamCorrMatrix$r)
+UpstreamCorrMatrixDF$Variable <- rownames(UpstreamCorrMatrixDF)
+UpstreamCorrMatrixDF <- UpstreamCorrMatrixDF[, c("Variable", setdiff(names(UpstreamCorrMatrixDF), "Variable"))]
+# Correlation coefficients
+write_csv(UpstreamCorrMatrixDF, "results/2021/correlation/coefficients/UpstreamCorrMatrixCoeffs.csv")
+# P values
+write_csv(as.data.frame(UpstreamCorrMatrixDF$P), "results/2021/correlation/pvalues/UpstreamCorrMatrixPVals.csv")
+#---------------------------------------------------------------------------------------------------------------------------------------------------
+### EVs2021Catchment + RVsTS2021
+## Create catchment correlation matrix dataset - 9 landscape variables + thermal sensitivity, mean air temperature, mean stream temperature
+# Join TS RVs and 9 landscape EVs
+TSandCatchmentEVsData <- TSAndEVs2021[, c(RVsTS2021, EVs2021Catchment)]
+# Check
+View(TSandCatchmentEVsData)
+# Compute catchment correlation matrix using Spearman's 
+CatchmentCorrMatrix <- rcorr(as.matrix(TSandCatchmentEVsData), type = "spearman")
+# Save CatchmentCorrMatrix of 9 landscape EVs + thermal sensitivity, mean air temperature, mean stream temperature: RDS & csv
+saveRDS(CatchmentCorrMatrix, "results/2021/correlation/RDS/CatchmentCorrMatrix.RDS")
 
+# Save correlation matrix as CSV with names in first column
+CatchmentCorrMatrixDF <- as.data.frame(CatchmentCorrMatrix$r)
+CatchmentCorrMatrixDF$Variable <- rownames(CatchmentCorrMatrixDF)
+CatchmentCorrMatrixDF <- CatchmentCorrMatrixDF[, c("Variable", setdiff(names(CatchmentCorrMatrixDF), "Variable"))]
+# Correlation coefficients
+write_csv(CatchmentCorrMatrixDF, "results/2021/correlation/coefficients/CatchmentCorrMatrixCoeffs.csv")
+# P values
+write_csv(as.data.frame(CatchmentCorrMatrixDF$P), "results/2021/correlation/pvalues/CatchmentCorrMatrixPVals.csv")
+#---------------------------------------------------------------------------------------------------------------------------------------------------
+### EVs2021Buffer + RVsTS2021
+## Create buffer correlation matrix dataset - 9 landscape variables + thermal sensitivity, mean air temperature, mean stream temperature
+# Join TS RVs and 9 landscape EVs
+TSandBufferEVsData <- TSAndEVs2021[, c(RVsTS2021, EVs2021Buffer)]
+# Check
+View(TSandBufferEVsData)
+# Compute buffer correlation matrix using Spearman's 
+BufferCorrMatrix <- rcorr(as.matrix(TSandBufferEVsData), type = "spearman")
+# Save BufferCorrMatrix of 9 landscape EVs + thermal sensitivity, mean air temperature, mean stream temperature: RDS & csv
+saveRDS(BufferCorrMatrix, "results/2021/correlation/RDS/BufferCorrMatrix.RDS")
 
+# Save correlation matrix as CSV with names in first column
+BufferCorrMatrixDF <- as.data.frame(BufferCorrMatrix$r)
+BufferCorrMatrixDF$Variable <- rownames(BufferCorrMatrixDF)
+BufferCorrMatrixDF <- BufferCorrMatrixDF[, c("Variable", setdiff(names(BufferCorrMatrixDF), "Variable"))]
+# Correlation coefficients
+write_csv(BufferCorrMatrixDF, "results/2021/correlation/coefficients/BufferCorrMatrixCoeffs.csv")
+# P values
+write_csv(as.data.frame(BufferCorrMatrixDF$P), "results/2021/correlation/pvalues/BufferCorrMatrixPVals.csv")
+#---------------------------------------------------------------------------------------------------------------------------------------------------
+### EVs2021Climate + RVsTS2021
+## Create climate correlation matrix dataset - 6 climate variables + thermal sensitivity, mean air temperature, mean stream temperature
+# Join TS RVs and 6 climate EVs
+TSandClimateEVsData <- TSAndEVs2021[, c(RVsTS2021, EVs2021Climate)]
+# Check
+View(TSandClimateEVsData)
+# Compute climate correlation matrix using Spearman's 
+ClimateCorrMatrix <- rcorr(as.matrix(TSandClimateEVsData), type = "spearman")
+# Save ClimateCorrMatrix of 6 climate EVs + thermal sensitivity, mean air temperature, mean stream temperature: RDS & csv
+saveRDS(ClimateCorrMatrix, "results/2021/correlation/RDS/ClimateCorrMatrix.RDS")
 
-
-
-
-# OLD VERIFICATION METHODS AFTER DOING CORRELATION --------------------------------------------------------------------------------------------
-cat("\n=== VERIFICATION METHODS ===\n")
-
-# Method A: Compare with base R cor() function
-cat("Verification A: Compare with base R cor() function\n")
-base_r_corr <- cor(corrDataClean, method = "spearman", use = "complete.obs")
-thermal_base <- base_r_corr["thermalSensitivity", ]
-
-# Check if results match
-matches <- all.equal(TSCorrCoeff, thermal_base)
-cat("Hmisc and base R results match:", is.logical(matches) && matches, "\n")
-
-# Method B: Manual calculation for one variable (as example)
-cat("\nVerification B: Manual Spearman calculation example\n")
-# Pick first landscape variable for manual verification
-test_var <- thermal_results$variable[1]
-cat("Testing variable:", test_var, "\n")
-
-# Manual Spearman calculation
-x_ranks <- rank(corrDataClean$thermalSensitivity)
-y_ranks <- rank(corrDataClean[[test_var]])
-manual_spearman <- cor(x_ranks, y_ranks)
-
-auto_spearman <- TSCorrCoeff[test_var]
-cat("Manual Spearman:", round(manual_spearman, 6), "\n")
-cat("Automatic Spearman:", round(auto_spearman, 6), "\n")
-cat("Match:", round(manual_spearman, 6) == round(auto_spearman, 6), "\n")
-
-# Method C: Check with psych package
-psych_result <- corr.test(corrDataClean, method = "spearman")
-psych_thermal <- psych_result$r["thermalSensitivity", ]
-cat("\nVerification C: psych package results match:", 
-    all.equal(TSCorrCoeff, psych_thermal), "\n")
+# Save correlation matrix as CSV with names in first column
+ClimateCorrMatrixDF <- as.data.frame(ClimateCorrMatrix$r)
+ClimateCorrMatrixDF$Variable <- rownames(ClimateCorrMatrixDF)
+ClimateCorrMatrixDF <- ClimateCorrMatrixDF[, c("Variable", setdiff(names(ClimateCorrMatrixDF), "Variable"))]
+# Correlation coefficients
+write_csv(ClimateCorrMatrixDF, "results/2021/correlation/coefficients/ClimateCorrMatrixCoeffs.csv")
+# P values
+write_csv(as.data.frame(ClimateCorrMatrixDF$P), "results/2021/correlation/pvalues/ClimateCorrMatrixPVals.csv")
+#---------------------------------------------------------------------------------------------------------------------------------------------------
+### Correlation plots divided based on scale

@@ -378,11 +378,11 @@ if(!is.null(testModel)) {
     write_csv(direction_results, "results/2021/MLR/directionCheck/TestModel1_direction_check.csv")
 }
 
-## Commenting out for now 
-# # Test multiple parameter combinations
-# cat("\n\n=== TESTING MULTIPLE COMBINATIONS ===\n")
-# all_results <- testParameterCombinations()
 
-# # Show final comparison of all models
-# cat("\n\n=== FINAL RESULTS ===\n")
-# showComparison()
+# Test multiple parameter combinations
+cat("\n\n=== TESTING MULTIPLE COMBINATIONS ===\n")
+all_results <- testParameterCombinations()
+
+# Show final comparison of all models
+cat("\n\n=== FINAL RESULTS ===\n")
+showComparison()

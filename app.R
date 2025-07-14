@@ -29,18 +29,18 @@ conflicted::conflict_prefer("lag", "dplyr")
 conflicted::conflict_prefer("layout", "plotly")
 
 # Loading 73 site coordinates to place clickable markers on rendered Leaflet map
-coordinates2021 <- readRDS("coordinates2021.RDS")
+coordinates2021 <- readRDS("results/2021/RDS/coordinates2021.RDS")
 # Checking coordinates2021
 coordinates2021
 
 # Loading stream temperature datasets for 73 sites
-streamDataCRB2021 <- readRDS("CRBDailyStreamTemps2021.rds")
-head(streamDataCRB2021 ) # 72 sites
-streamDataAREMP2021 <- readRDS("AREMPDailyStreamTemps2021.rds")
-streamDataAREMP2021 # 1 site 
+CRBStreamTemperatureMMM2021 <- readRDS("results/2021/RDS/CRBStreamTemperatureMMM2021.RDS")
+head(CRBStreamTemperatureMMM2021 ) # 72 sites
+AREMPStreamTemperatureMMM2021 <- readRDS("results/2021/RDS/AREMPStreamTemperatureMMM2021.RDS")
+AREMPStreamTemperatureMMM2021 # 1 site 
 # Loading air temperature data for 73 sites from PRISM
-airTempData2021 <- readRDS("airTemperature2021.RDS")
-head(airTempData2021)
+airTemperature2021 <- readRDS("results/2021/RDS/airTemperature2021.RDS")
+head(airTemperature2021)
 
 # Define UI for application that allows user to click on one of 73 sites to view
 # air-stream temperature time-series & thermal sensitivity over 7/1/2021 - 8/31/2021
@@ -93,18 +93,18 @@ server <- function(input, output) {
         req(input$siteMap_marker_click)
         clickedSite <- input$siteMap_marker_click$id
         # Determine if site choice is 1/72 CRB sites OR the 1 AREMP site
-        if (clickedSite %in% streamDataAREMP2021$siteID) {
+        if (clickedSite %in% AREMPStreamTemperatureMMM2021$siteID) {
             # Clicked site is 1 AREMP site
-            siteStreamData <- streamDataAREMP2021 %>% filter(siteID == clickedSite)
-        } else if (clickedSite %in% streamDataCRB2021$siteID) {
+            siteStreamData <- AREMPStreamTemperatureMMM2021 %>% filter(siteID == clickedSite)
+        } else if (clickedSite %in% CRBStreamTemperatureMMM2021$siteID) {
             # Clicked site is 1 of 72 CRB sites
-            siteStreamData <- streamDataCRB2021 %>% filter(siteID == clickedSite)
+            siteStreamData <- CRBStreamTemperatureMMM2021 %>% filter(siteID == clickedSite)
         } else {
             # Empty if clicked site not found in stream temp datasets
             return(data.frame())
         } 
         # Get air temperature data for clicked site
-        siteAirData <- airTempData2021 %>% 
+        siteAirData <- airTemperature2021 %>% 
             filter(site == clickedSite)
         # Merge stream temperature data and air temperature data together based on site source (CRB or AREMP)
         siteData <- siteStreamData %>%

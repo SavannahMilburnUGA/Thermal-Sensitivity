@@ -357,7 +357,7 @@ testParameterCombinations <- function(vif_cutoffs = c(5, 10, 15, 20),
     return(final_comparison)
 }
 #-------------------------------------------------------------------------------------------------------------------
-# Test single model
+# Test single model - initial model 
 cat("=== TESTING SINGLE MODEL ===\n")
 testModel <- generateMLRModel(vifCutOff = 20, corrCutOff = 0.6, 
                               includedEVs = EVs2021, MLRModelName = "TestModel")
@@ -377,8 +377,7 @@ if(!is.null(testModel)) {
     write_csv(model_summary, "results/2021/MLR/infoSummary/TestModel1_summary.csv")
     write_csv(direction_results, "results/2021/MLR/directionCheck/TestModel1_direction_check.csv")
 }
-
-
+#-------------------------------------------------------------------------------------------------------------------
 # Test multiple parameter combinations
 cat("\n\n=== TESTING MULTIPLE COMBINATIONS ===\n")
 all_results <- testParameterCombinations()

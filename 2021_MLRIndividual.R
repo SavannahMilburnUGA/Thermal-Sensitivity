@@ -201,3 +201,22 @@ dev.off()
 shapiro.test(residuals(a00.model5))  # Normality test
 summary(a00.model5)$r.squared  # Check R²
 summary(a00.model5)$adj.r.squared  # Check adjusted R²
+
+#----------------------------------------------------------------------------------------------------------------
+## Testing individual models
+
+# Change landscape EVs
+baseModelVars <- c("SLOPE", "Solar", "h2oLakesPe", "h2oHiCascP", "h2oWetland", "Shrub21", "h2oKm2", "BurnRCA")
+# change 2x : vector & nvmax
+baseBestSubset <-
+    regsubsets(thermalSensitivity~., data =TSAndEVs2021[ , c("thermalSensitivity", baseModelVars)], nbest = 1, nvmax = length(baseModelVars), force.in = NULL, force.out = NULL, method = "exhaustive")
+baseSummaryBestSubset <- summary(baseBestSubset)
+as.data.frame(baseSummaryBestSubset$outmat)
+which.max(baseSummaryBestSubset$adjr2)
+baseSummaryBestSubset$which[8, ] # Change num - copy paste below but don't forget data = TSAndEVs2021
+baseModel <- lm(thermalSensitivity~ SLOPE+Solar+h2oLakesPe+h2oHiCascP+h2oWetland+Shrub21+h2oKm2+BurnRCA, data=TSAndEVs2021)
+# Summary
+baseModelStd <- lm.beta(baseModel)
+summary(baseModelStd)
+coef(baseModelStd)
+summary(baseModelStd)$adj.r.squared 

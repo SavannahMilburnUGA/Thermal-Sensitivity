@@ -102,7 +102,7 @@ generateMLRModel <- function(vifCutOff, corrCutOff, includedEVs, MLRModelName) {
                 cat(sprintf("  %s: VIF = %.2f, Adj R² = %.3f\n", var1, b00.var1VIF, b00.var1AdjRSquared))
                 cat(sprintf("  %s: VIF = %.2f, Adj R² = %.3f\n", var2, b00.var2VIF, b00.var2AdjRSquared))
                 
-                # Decision logic: prefer lower VIF, but if similar VIF, prefer higher adjusted R²
+                
                 VIFDiff <- abs(b00.var1VIF - b00.var2VIF)
                 
                 if(VIFDiff > 2) {

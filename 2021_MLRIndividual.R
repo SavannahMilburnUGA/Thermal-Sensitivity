@@ -1,4 +1,8 @@
-## Running MLR using 2.4 section - initial model
+## Finalized MLR model using 2.4 Section as framework
+# Choose VIF 15, correlation 0.6
+
+# Decision logic: prefer lower VIF, but if similar VIF (VIFDiff <= 2), prefer higher adjusted R²
+# SLOPE, h2oLakesPe, h2oHiCascP, h2oWetland, Shrub21, BurnRCA
 
 # Clean house & remove saved files (keeping it clean)
 # Remove all objects in workspace 
@@ -206,15 +210,15 @@ summary(a00.model5)$adj.r.squared  # Check adjusted R²
 ## Testing individual models
 
 # Change landscape EVs
-baseModelVars <- c("SLOPE", "Solar", "h2oLakesPe", "h2oHiCascP", "h2oWetland", "Shrub21", "h2oKm2", "BurnRCA")
+baseModelVars <- c("SLOPE", "h2oLakesPe", "h2oHiCascP", "h2oWetland", "Shrub21", "BurnRCA")
 # change 2x : vector & nvmax
 baseBestSubset <-
     regsubsets(thermalSensitivity~., data =TSAndEVs2021[ , c("thermalSensitivity", baseModelVars)], nbest = 1, nvmax = length(baseModelVars), force.in = NULL, force.out = NULL, method = "exhaustive")
 baseSummaryBestSubset <- summary(baseBestSubset)
 as.data.frame(baseSummaryBestSubset$outmat)
 which.max(baseSummaryBestSubset$adjr2)
-baseSummaryBestSubset$which[8, ] # Change num - copy paste below but don't forget data = TSAndEVs2021
-baseModel <- lm(thermalSensitivity~ SLOPE+Solar+h2oLakesPe+h2oHiCascP+h2oWetland+Shrub21+h2oKm2+BurnRCA, data=TSAndEVs2021)
+baseSummaryBestSubset$which[6, ] # Change num - copy paste below but don't forget data = TSAndEVs2021
+baseModel <- lm(thermalSensitivity~ SLOPE+h2oLakesPe+h2oHiCascP+h2oWetland+Shrub21+BurnRCA, data=TSAndEVs2021)
 # Summary
 baseModelStd <- lm.beta(baseModel)
 summary(baseModelStd)

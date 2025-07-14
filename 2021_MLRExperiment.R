@@ -1,4 +1,4 @@
-## Experimenting w/ MLR to find best criteria & EVs - Removing WetlandBuf (caused direction mismatch)
+## Experimenting w/ MLR to find best criteria & EVs - Removing WetlandBuf & Solar (caused direction mismatch)
 ## Running MLR using 2.4 section - initial model
 
 # Clean house & remove saved files (keeping it clean)
@@ -15,7 +15,7 @@ nrow(TSAndEVs2021)
 # Load full correlation matrix
 fullCorrMatrix <- readRDS("results/2021/correlation/RDS/fullCorrMatrix.RDS")
 # Define all EVs/landscape variables from Michael 
-EVs2021 <- c("SLOPE", "Solar", "Elev", "BFI", "h2oDevelop", "h2oLakesPe", "h2oAgricul", "h2oBurnPer", "h2oRdDens", "h2oHiCascP", "h2oWetland", "h2oVegCov", "h2oVegHt", "Forest21", "Shrub21", "h2oKm2", "BurnRCA", "AgricultRC", "WetlandsRC", "LakesRCA", "HiCascRCA", "DevelopRCA", "RoadsRCA", "VegCover", "VegHeight_","DevelopBuf", "AgBuf", "BurnBuf", "LakesBuf", "HiCascBuf", "RoadsBuf", "VegHtBuf", "VegCovBuf","MeanMaxAir", "MaxAir_C", "Precip_mm", "SumPrecip", "MeanAirJJA", "WetPrecip")
+EVs2021 <- c("SLOPE", "Elev", "BFI", "h2oDevelop", "h2oLakesPe", "h2oAgricul", "h2oBurnPer", "h2oRdDens", "h2oHiCascP", "h2oWetland", "h2oVegCov", "h2oVegHt", "Forest21", "Shrub21", "h2oKm2", "BurnRCA", "AgricultRC", "WetlandsRC", "LakesRCA", "HiCascRCA", "DevelopRCA", "RoadsRCA", "VegCover", "VegHeight_","DevelopBuf", "AgBuf", "BurnBuf", "LakesBuf", "HiCascBuf", "RoadsBuf", "VegHtBuf", "VegCovBuf","MeanMaxAir", "MaxAir_C", "Precip_mm", "SumPrecip", "MeanAirJJA", "WetPrecip")
 
 #------------------------------------------------------------------------------------------------------------------------------------------------
 # Load libraries
@@ -359,23 +359,23 @@ testParameterCombinations <- function(vif_cutoffs = c(5, 10, 15, 20),
 #-------------------------------------------------------------------------------------------------------------------
 # Test single model - initial model 
 cat("=== TESTING SINGLE MODEL ===\n")
-noWetlandBuf <- generateMLRModel(vifCutOff = 20, corrCutOff = 0.6, 
-                              includedEVs = EVs2021, MLRModelName = "noWetlandBuf")
+noWetlandBufNoSolar <- generateMLRModel(vifCutOff = 20, corrCutOff = 0.6, 
+                              includedEVs = EVs2021, MLRModelName = "noWetlandBufNoSolar")
 
-if(!is.null(noWetlandBuf)) {
+if(!is.null(noWetlandBufNoSolar)) {
     # Check direction
-    direction_results <- checkDirection(noWetlandBuf$model, fullCorrMatrix)
+    direction_results <- checkDirection(noWetlandBufNoSolar$model, fullCorrMatrix)
     
     # Generate comprehensive summary
-    model_summary <- generateInfoSummary(noWetlandBuf$model, fullCorrMatrix, 
-                                        direction_results, "noWetlandBuf")
+    model_summary <- generateInfoSummary(noWetlandBufNoSolar$model, fullCorrMatrix, 
+                                        direction_results, "noWetlandBufNoSolar")
     
     # Add to comparison tracker
-    addToComparison(noWetlandBuf, direction_results, "noWetlandBuf", 20, 0.6)
+    addToComparison(noWetlandBufNoSolar, direction_results, "noWetlandBufNoSolar", 20, 0.6)
     
     # Save results
-    write_csv(model_summary, "results/2021/MLR/infoSummary/noWetlandBuf_summary.csv")
-    write_csv(direction_results, "results/2021/MLR/directionCheck/noWetlandBuf_direction_check.csv")
+    write_csv(model_summary, "results/2021/MLR/infoSummary/noWetlandBufNoSolar_summary.csv")
+    write_csv(direction_results, "results/2021/MLR/directionCheck/noWetlandBufNoSolar_direction_check.csv")
 }
 #-------------------------------------------------------------------------------------------------------------------
 # Test multiple parameter combinations

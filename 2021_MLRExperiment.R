@@ -43,7 +43,7 @@ generateMLRModel <- function(vifCutOff, corrCutOff, includedEVs, MLRModelName) {
         b00.VIFs <- vif(b00.model1)
         # Saving VIF values
         write.csv(data.frame(Variable = names(b00.VIFs), VIF = b00.VIFs), 
-                 sprintf("results/2021/MLR/%s_VIFs.csv", MLRModelName))
+                 sprintf("results/2021/MLR/VIFs/%s_VIFs.csv", MLRModelName))
         # Cutting out landscape EVs w/ high VIFs
         b00.EVsHighVIF <- names(b00.VIFs[b00.VIFs > vifCutOff])
         cat("Landscape EVs with VIFs above VIF cut off: ")

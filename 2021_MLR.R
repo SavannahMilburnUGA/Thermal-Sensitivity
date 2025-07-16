@@ -126,6 +126,7 @@ findCorrelations <- function(corrMatrix, corrCutOff, inputEVs, VIFs, data) {
 #--------------------------------------------------------------------------------------------------------------------------------------------------------
 # Define all EVs/landscape variables from Michael - remove Solar as an EV
 EVs2021 <- c("SLOPE", "Elev", "BFI", "h2oDevelop", "h2oLakesPe", "h2oAgricul", "h2oBurnPer", "h2oRdDens", "h2oHiCascP", "h2oWetland", "h2oVegCov", "h2oVegHt", "Forest21", "Shrub21", "h2oKm2", "BurnRCA", "AgricultRC", "WetlandsRC", "LakesRCA", "HiCascRCA", "DevelopRCA", "RoadsRCA", "VegCover", "VegHeight_","DevelopBuf", "AgBuf", "BurnBuf", "WetlandBuf", "LakesBuf", "HiCascBuf", "RoadsBuf", "VegHtBuf", "VegCovBuf","MeanMaxAir", "MaxAir_C", "Precip_mm", "SumPrecip", "MeanAirJJA", "WetPrecip")
+# SLOPE, Elev, BFI, h2oDevelop, h2oLakesPe, h2oAgricul, h2oBurnPer, h2oRdDens, h2oHiCascP, h2oWetland, h2oVegCov, h2oVegHt, Forest21, Shrub21, h2oKm2, BurnRCA, AgricultRC, WetlandsRC, LakesRCA, HiCascRCA, DevelopRCA, RoadsRCA, VegCover, VegHeight_, DevelopBuf, AgBuf, BurnBuf, WetlandBuf, LakesBuf, HiCascBuf, RoadsBuf, VegHtBuf, VegCovBuf, MeanMaxAir, MaxAir_C, Precip_mm, SumPrecip, MeanAirJJA, WetPrecip
 # Loading RDS of thermal sensitivities joined w/ EV values for 2021
 TSAndEVs2021 <- readRDS("results/2021/RDS/TSandEVs2021.RDS")
 # Check
@@ -149,15 +150,15 @@ print("All landscape variables with VIF values: ")
 print(VIFs)
 # Saving VIF values
 write.csv(data.frame(Variable = names(VIFs), VIF = VIFs), "results/2021/MLR/model1VIFs.csv")
-
+# Elev, BFI, h2oDevelop, h2oAgricul, h2oBurnPer, h2oVegCov, h2oVegHt, Forest21, AgricultRC, LakesRCA, DevelopRCA, VegCover, VegHeight_, DevelopBuf, BurnBuf, LakesBuf, VegHtBuf, VegCovBuf, MeanMaxAir, MaxAir_C, Precip_mm, SumPrecip, MeanAirJJA, WetPrecip
 # Finding EVs greater than VIF cutoff 
 EVsHighVIF <- VIFs[VIFs > 15]
 print("Landscape variables with VIF > 15: ")
 print(EVsHighVIF)
-# Keep: SLOPE, h20LakesPe, h2oRdDens, h20HiCascP, Shrub21, h20km2, BurnRCA, WetlandsRC, HiCascRCA, RoadsRCA, AgBuf, WetlandBuf, HiCascBuf, RoadsBuf
+# Keep: SLOPE, h20LakesPe, h2oRdDens, h20HiCascP, h2oWetland, Shrub21, h20km2, BurnRCA, WetlandsRC, HiCascRCA, RoadsRCA, AgBuf, WetlandBuf, HiCascBuf, RoadsBuf
 # Take out EVsHighVIF from model1
 # Create linear regression w/ thermal sensitivity as RV & landscape varbs as EVs that have VIFS <= 15
-model2 <- lm(thermalSensitivity ~ SLOPE + h2oLakesPe + h2oRdDens + h2oHiCascP + Shrub21 + h2oKm2 + BurnRCA + WetlandsRC + HiCascRCA + RoadsRCA + AgBuf + WetlandBuf + HiCascBuf + RoadsBuf, data = TSAndEVs2021)
+model2 <- lm(thermalSensitivity ~ SLOPE + h2oLakesPe + h2oRdDens + h2oHiCascP + h2oWetland + Shrub21 + h2oKm2 + BurnRCA + WetlandsRC + HiCascRCA + RoadsRCA + AgBuf + WetlandBuf + HiCascBuf + RoadsBuf, data = TSAndEVs2021)
 # Create lm beta model
 betaModel2 <- lm.beta(model2)
 # Creating model 2 info summary for comparison across steps - EVs with VIFs <= 15
@@ -168,7 +169,7 @@ write_csv(model2InfoSummary, "results/2021/MLR/Model 2 Info Summary.csv")
 #3: Once ALIASED VARBS w/ HIGH VIFs were REMOVED: then REMOVED EVs w/ HIGH LINEAR CORRELATION VALUES that CONFOUNDED results from MULTICOLLINEAR ANALYSES - CORRELATION COEFFICIENT VALUES >= 0.6
 #### Decision logic: remove based on highest VIF - if VIF similar (VIFDiff <= 2 - remove based on individual lower adjusted R^2)
 # Declare model 2 landscape EVs - variables that are less than/equal to VIF cut off of 15
-model2EVs <- c("SLOPE", "h2oLakesPe", "h2oRdDens", "h2oHiCascP", "Shrub21", "h2oKm2", "BurnRCA", "WetlandsRC", "HiCascRCA", "RoadsRCA", "AgBuf", "WetlandBuf", "HiCascBuf", "RoadsBuf")
+model2EVs <- c("SLOPE", "h2oLakesPe", "h2oRdDens", "h2oHiCascP", "h2oWetland", "Shrub21", "h2oKm2", "BurnRCA", "WetlandsRC", "HiCascRCA", "RoadsRCA", "AgBuf", "WetlandBuf", "HiCascBuf", "RoadsBuf")
 # Subset model 2 landscape EVs from full correlation matrix
 model2CorrMatrix <- fullCorrMatrix$r[model2EVs, model2EVs]
 ## Checking findCorrelation manually by looking at model2CorrMatrix
@@ -182,13 +183,13 @@ View(model2CorrMatrix)
 model3CorrResults <- findCorrelations(corrMatrix = model2CorrMatrix, corrCutOff = 0.6, inputEVs = model2EVs, VIFs = VIFs, data = TSAndEVs2021)
 model3Vars <- model3CorrResults$finalEVs
 print(model3Vars) # Removed h2oKm2, HiCascRCA, WetlandsRC, RoadsRCA
-## Keep: SLOPE, h2oLakesPe, h2oRdDens, h2oHiCascP, Shrub21, BurnRCA, AgBuf, WetlandBuf, HiCascBuf, RoadsBuf
+## Keep: SLOPE, h2oLakesPe, h2oRdDens, h2oHiCascP, h2oWetland, Shrub21, BurnRCA, AgBuf, WetlandBuf, HiCascBuf, RoadsBuf
 # Declare model 3 landscape EVs - variables that have correlation coefficients > 0.6
-model3EVs <- c("SLOPE", "h2oLakesPe", "h2oRdDens", "h2oHiCascP", "Shrub21", "BurnRCA", "AgBuf", "WetlandBuf", "HiCascBuf", "RoadsBuf")
+model3EVs <- c("SLOPE", "h2oLakesPe", "h2oRdDens", "h2oHiCascP", "h2oWetland", "Shrub21", "BurnRCA", "AgBuf", "WetlandBuf", "HiCascBuf", "RoadsBuf")
 # Subset model 3 landscape EVs from full correlation matrix
 model3CorrMatrix <- fullCorrMatrix$r[model3EVs, model3EVs]
 # Create linear regression w/ thermal sensitivity as RV & landscape varbs as EVs that have VIFS <= 15, correlation coefficients < 0.6 
-model3 <- lm(thermalSensitivity ~ SLOPE + h2oLakesPe + h2oRdDens + h2oHiCascP + Shrub21 + BurnRCA + AgBuf + WetlandBuf + HiCascBuf + RoadsBuf, data = TSAndEVs2021)
+model3 <- lm(thermalSensitivity ~ SLOPE + h2oLakesPe + h2oRdDens + h2oHiCascP + h2oWetland + Shrub21 + BurnRCA + AgBuf + WetlandBuf + HiCascBuf + RoadsBuf, data = TSAndEVs2021)
 # Create lm beta model
 betaModel3 <- lm.beta(model3)
 # Creating model 3 info summary for comparison across steps - EVs with VIFs <= 15, correlation coefficients < 0.6
@@ -202,12 +203,12 @@ bestSubset <-
 summaryBestSubset <- summary(bestSubset)
 as.data.frame(summaryBestSubset$outmat)
 # Ran leaps through dataset -> what recommended # of predictors to use
-which.max(summaryBestSubset$adjr2) # 5 recommended # of predictors
-# What are the 5 best predictors
-summaryBestSubset$which[5, ]
-# Keep: SLOPE, h2oHiCascP, Shrub21, BurnRCA, AgBuf
+which.max(summaryBestSubset$adjr2) # 6 recommended # of predictors
+# What are the 6 best predictors
+summaryBestSubset$which[6, ]
+# Keep: SLOPE, h2oLakesPe, h2oHiCascP, h2oWetland, Shrub21, BurnRCA
 # Create linear regression w/ thermal sensitivity as RV & landscape varbs as EVs recommended by leaps 
-model4 <- lm(thermalSensitivity ~ SLOPE + h2oHiCascP + Shrub21 + BurnRCA + AgBuf, data = TSAndEVs2021)
+model4 <- lm(thermalSensitivity ~ SLOPE + h2oLakesPe + h2oHiCascP + h2oWetland + Shrub21 + BurnRCA, data = TSAndEVs2021)
 #-------------------------------------------------------------------------------------------------------------------------------------------------
 #5: Then used lm.beta PACKAGE to EXTRACT STANDARDIZED BETA COEFFICIENT (estimates RELATIVE EFFECT of EACH EV on RV)
 # Standardize using lm.beta

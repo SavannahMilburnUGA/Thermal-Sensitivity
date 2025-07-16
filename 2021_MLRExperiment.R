@@ -1,5 +1,6 @@
 ## Experimenting w/ MLR to find best criteria & EVs - Removing WetlandBuf & Solar (caused direction mismatch)
-## Running MLR using 2.4 section - initial model
+### Removed only WetlandBuf first but resulted in MORE direction mismatches so removed both WetlandBuf & Solar
+## Running MLR using 2.4 section 
 
 # Clean house & remove saved files (keeping it clean)
 # Remove all objects in workspace 
@@ -14,7 +15,7 @@ TSAndEVs2021 <- readRDS("results/2021/RDS/TSandEVs2021.RDS")
 nrow(TSAndEVs2021)
 # Load full correlation matrix
 fullCorrMatrix <- readRDS("results/2021/correlation/RDS/fullCorrMatrix.RDS")
-# Define all EVs/landscape variables from Michael 
+# Define EVs/landscape variables from Michael - no Solar, WetlandBuf
 EVs2021 <- c("SLOPE", "Elev", "BFI", "h2oDevelop", "h2oLakesPe", "h2oAgricul", "h2oBurnPer", "h2oRdDens", "h2oHiCascP", "h2oWetland", "h2oVegCov", "h2oVegHt", "Forest21", "Shrub21", "h2oKm2", "BurnRCA", "AgricultRC", "WetlandsRC", "LakesRCA", "HiCascRCA", "DevelopRCA", "RoadsRCA", "VegCover", "VegHeight_","DevelopBuf", "AgBuf", "BurnBuf", "LakesBuf", "HiCascBuf", "RoadsBuf", "VegHtBuf", "VegCovBuf","MeanMaxAir", "MaxAir_C", "Precip_mm", "SumPrecip", "MeanAirJJA", "WetPrecip")
 
 #------------------------------------------------------------------------------------------------------------------------------------------------

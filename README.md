@@ -1,4 +1,4 @@
-# Thermal-Sensitivity - experimenting branch
+# Thermal-Sensitivity: experimenting branch
 1) Created functions that:
    1) generated MLR models based on parameters: includedEVs, correlation coefficient cut-off, VIF cut-off.
    2) Info summaries for each MLR model.

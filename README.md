@@ -1,10 +1,11 @@
-# Thermal-Sensitivity
-* Analyze the relationship between air temperature & stream temperature (thermal sensitivity - slope) using time-series data in CRB. <br>
-* Analyze spatial variation of thermal sensitivity. <br>
-* How do landscape variables explain the spatial variation of thermal sensitivity. <br>
-# Current tasks
-1) Join existing data present in CRB data folders for 2021, 2022, 2023, 2024. <br>
-2) Find common periods by analyzing data for month & year.
-   1) Thermal sensitivity early summer vs. late summer (depends on data)
-   2) May just use 1-2 months for all stations (depends on data)
-3) Get max & thermal sensitivity values (static -> can see data availability for landscape variables after). <br>
+# Thermal-Sensitivity - experimenting branch
+1) Created functions that:
+   1) generated MLR models based on parameters: includedEVs, correlation coefficient cut-off, VIF cut-off.
+   2) Info summaries for each MLR model.
+   3) Tracking if the direction was mismatched for each MLR (correlation coefficients & standardized beta coefficients from lm beta MLR).
+2) Ran experimentation script to find 9 best models using VIFs 20, 15, 10, 5 w/ correlation cut-offs 0.8, 0.7, 0.6:
+   * All 9 models had 1 direction mismatch:
+   ** Models w/ VIFs 20, 15: was always Solar EV that created direction mismatch.
+     * Models w/ VIFs 10: was always WetlandBuf EV that created direction mismatch. (Solar was also not even in model) 
+   * Adjusted R squared: models w/ VIFs 10: significantly lower adjusted R squared. 
+   * Significant variables: models w/ VIFs 20: larger % of significant EVs/included EVs.

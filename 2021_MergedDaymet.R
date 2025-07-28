@@ -1,12 +1,14 @@
-# Finding average DAYMET values for each site to merge w/ derived TSAndEVs2021.csv - sorted w/ index
+# Finding average DAYMET values for each site to merge w/ already derived TSAndEVs2021.csv - sorted w/ index
+# added: daymet_: dayl, prcp, srad, swe (all 0), tmax, tmin, vp
+# Now have 
 library(dplyr)
 library(readr)
 
 # Paths for files 
 main_csv_file <- "results/2021/SortedTSAndEVs2021.csv"
 daymet_directory <- "daymet/results/filtered"           
-output_file <- "SortedDaymetTSAndEVs2021.csv"
-#-------------
+output_file <- "results/2021/SortedDaymetTSAndEVs2021.csv"
+# Function to iterate over 72 DAYMET files & find the average and merge data to SortedTSandEVs2021.csv
 merge_daymet_with_main <- function(main_csv_path, daymet_folder, output_path = NULL) {
   
   # Read the main CSV file
@@ -14,16 +16,14 @@ merge_daymet_with_main <- function(main_csv_path, daymet_folder, output_path = N
   main_df <- read_csv(main_csv_path, show_col_types = FALSE)
   cat("Main CSV has", nrow(main_df), "sites (rows)\n")
   
-  # Get all DAYMET CSV files and sort them numerically  
+  # Get all DAYMET CSV files and sort them numerically so can merge correclty with SortedTSAndEVs2021.csv
   daymet_files <- list.files(daymet_folder, pattern = "\\.csv$", full.names = FALSE)
-  
-  # Sort files numerically by extracting the number from filename
+  # Extracting the number from filename
   extract_number <- function(filename) {
     # Extract number between "daymetfile" and ".csv"
     num_str <- sub("daymetfile(\\d+)\\.csv", "\\1", filename)
     return(as.numeric(num_str))
   }
-  
   file_numbers <- sapply(daymet_files, extract_number)
   daymet_files <- daymet_files[order(file_numbers)]
   
@@ -31,23 +31,23 @@ merge_daymet_with_main <- function(main_csv_path, daymet_folder, output_path = N
   cat("First few files:", paste(head(daymet_files, 5), collapse = ", "), "\n")
   cat("Last few files:", paste(tail(daymet_files, 5), collapse = ", "), "\n")
   
-  # Check if number of files matches number of sites
+  # Check if number of files matches number of sites - should be 72
   if (length(daymet_files) != nrow(main_df)) {
     warning("Number of DAYMET files (", length(daymet_files), 
             ") doesn't match number of sites (", nrow(main_df), ")")
   }
   
-  # Initialize lists to store means for each DAYMET variable
+  # Initialize list to store average values for each DAYMET variable
   daymet_means <- list()
   
-  # Process each DAYMET file
+  # Iterate over each DAYMET file
   for (i in 1:length(daymet_files)) {
     filename <- daymet_files[i]
     
     cat("Processing file", i, "of", length(daymet_files), ":", filename, "\n")
     
     tryCatch({
-      # Read DAYMET file (no header rows to skip for filtered files)
+      # Read DAYMET file
       file_path <- file.path(daymet_folder, filename)
       daymet_df <- read_csv(file_path, skip = 0, show_col_types = FALSE)
       
@@ -60,12 +60,10 @@ merge_daymet_with_main <- function(main_csv_path, daymet_folder, output_path = N
       # Get all numeric columns except year and yday
       data_columns <- setdiff(names(daymet_df), c("year", "yday"))
       numeric_columns <- data_columns[sapply(daymet_df[data_columns], is.numeric)]
-      
-      # Calculate means for each numeric column
+      # Calculate average values
       site_means <- daymet_df %>%
         summarise(across(all_of(numeric_columns), ~ mean(.x, na.rm = TRUE)))
-      
-      # Store means for this site
+      # Save average values for this site
       for (col in numeric_columns) {
         if (i == 1) {
           # Initialize the list for this column
@@ -92,14 +90,7 @@ merge_daymet_with_main <- function(main_csv_path, daymet_folder, output_path = N
     })
   }
   
-  # Debug: Check the final lengths before adding to main dataframe
-  cat("\nDebug - Final daymet_means lengths:\n")
-  for (col_name in names(daymet_means)) {
-    cat("  ", col_name, ": length =", length(daymet_means[[col_name]]), 
-        ", non-NA values =", sum(!is.na(daymet_means[[col_name]])), "\n")
-  }
-  
-  # Add DAYMET means as new columns to main dataframe
+  # Add DAYMET averages as new columns to SortedTSAndEVs2021.csv
   cat("\nAdding DAYMET means to main CSV...\n")
   
   for (col_name in names(daymet_means)) {
@@ -112,13 +103,13 @@ merge_daymet_with_main <- function(main_csv_path, daymet_folder, output_path = N
   
   # Save the merged dataset
   if (is.null(output_path)) {
-    output_path <- "SortedDaymetTSAndEVs2021.csv"
+    output_path <- "results/2021/SortedDaymetTSAndEVs2021.csv"
   }
-  
   write_csv(main_df, output_path)
+  saveRDS(main_df, "results/2021/RDS/SortedDaymetTSAndEVs2021.RDS")
   cat("Saved merged dataset to:", output_path, "\n")
   
-  # Print summary
+  # Print summary to debug
   cat("\nSummary:\n")
   cat("- Original columns:", ncol(main_df) - length(daymet_means), "\n")
   cat("- New DAYMET columns:", length(daymet_means), "\n")
@@ -135,5 +126,5 @@ merge_daymet_with_main <- function(main_csv_path, daymet_folder, output_path = N
   return(main_df)
 }
 
-# Run the merge
+# Run the merge - added: daymet_: dayl, prcp, srad, swe (all 0), tmax, tmin, vp
 merged_data <- merge_daymet_with_main(main_csv_file, daymet_directory, output_file)

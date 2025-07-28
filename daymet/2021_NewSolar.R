@@ -1,6 +1,4 @@
 # Finding the new DAYMET solar radiation values for each site
-
-# Finding the new DAYMET solar radiation values for each site
 library(dplyr)
 library(readr)
 

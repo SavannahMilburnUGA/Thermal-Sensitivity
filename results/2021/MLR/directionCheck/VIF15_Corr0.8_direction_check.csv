@@ -1,0 +1,4 @@
+Variable,TSCorrelation,CorrelationDirection,StdCoefficient,StdCoefficientDirection,DirectionMatch
+SLOPE,-0.28205644578558814,Negative,-0.18317721224793568,Negative,TRUE
+h2oHiCascP,-0.7781816949824829,Negative,-0.7603949329561944,Negative,TRUE
+BurnRCA,-0.08320302557454584,Negative,-0.09881874169410042,Negative,TRUE

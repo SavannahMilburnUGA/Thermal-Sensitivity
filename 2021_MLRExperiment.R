@@ -1,5 +1,5 @@
-## Experimenting w/ MLR to find best criteria & EVs
-## Running MLR using 2.4 section - initial model
+## Experimenting w/ MLR to find best criteria & EVs - no Solar + DAYMET + orientation 
+## Running MLR using 2.4 section - initial model - no Solar + DAYMET + orientation 
 
 # Clean house & remove saved files (keeping it clean)
 # Remove all objects in workspace 
@@ -8,14 +8,14 @@ rm(list = ls())
 while (!is.null(dev.list())) dev.off()
 
 # Load all data: TSAndEVs2021, full correlation matrix, all EVs
-# Loading RDS of thermal sensitivities joined w/ EV values for 2021
-TSAndEVs2021 <- readRDS("results/2021/RDS/TSandEVs2021.RDS")
+# Load SortedDaymetTSAndEVs2021 from when DAYMET EVs were downloaded
+SortedO_D_TS_EVs2021 <- readRDS("results/2021/RDS/SortedO_D_TS_EVs2021.RDS")
 # Check
-nrow(TSAndEVs2021)
+nrow(SortedO_D_TS_EVs2021)
 # Load full correlation matrix
-fullCorrMatrix <- readRDS("results/2021/correlation/RDS/fullCorrMatrix.RDS")
-# Define all EVs/landscape variables from Michael 
-EVs2021 <- c("SLOPE", "Solar", "Elev", "BFI", "h2oDevelop", "h2oLakesPe", "h2oAgricul", "h2oBurnPer", "h2oRdDens", "h2oHiCascP", "h2oWetland", "h2oVegCov", "h2oVegHt", "Forest21", "Shrub21", "h2oKm2", "BurnRCA", "AgricultRC", "WetlandsRC", "LakesRCA", "HiCascRCA", "DevelopRCA", "RoadsRCA", "VegCover", "VegHeight_","DevelopBuf", "AgBuf", "BurnBuf", "WetlandBuf", "LakesBuf", "HiCascBuf", "RoadsBuf", "VegHtBuf", "VegCovBuf","MeanMaxAir", "MaxAir_C", "Precip_mm", "SumPrecip", "MeanAirJJA", "WetPrecip")
+full39_ODT_CorrMatrix <- readRDS("results/2021/correlation/RDS/full39_ODT_CorrMatrix.RDS")
+# Define 39 EVs/landscape variables from Michael - no Solar + 4 DAYMET EVs + Azimuth & AbsAzimuth
+EVs2021 <- c("SLOPE", "Elev", "BFI", "h2oDevelop", "h2oLakesPe", "h2oAgricul", "h2oBurnPer", "h2oRdDens", "h2oHiCascP", "h2oWetland", "h2oVegCov", "h2oVegHt", "Forest21", "Shrub21", "h2oKm2", "BurnRCA", "AgricultRC", "WetlandsRC", "LakesRCA", "HiCascRCA", "DevelopRCA", "RoadsRCA", "VegCover", "VegHeight_","DevelopBuf", "AgBuf", "BurnBuf", "WetlandBuf", "LakesBuf", "HiCascBuf", "RoadsBuf", "VegHtBuf", "VegCovBuf","MeanMaxAir", "MaxAir_C", "Precip_mm", "SumPrecip", "MeanAirJJA", "WetPrecip", "daymetDayl", "daymetPrcp", "daymetSRad", "daymetVP", "Azimuth", "AbsAzimuth")
 
 #------------------------------------------------------------------------------------------------------------------------------------------------
 # Load libraries
@@ -37,7 +37,7 @@ generateMLRModel <- function(vifCutOff, corrCutOff, includedEVs, MLRModelName) {
         cat("\n--- Step 1: VIF Filtering ---\n")
         # Create linear regression w/ thermal sensitivity as RV & landscape varbs as EVs
         regression <- paste("thermalSensitivity ~", paste(includedEVs, collapse = " + "))
-        b00.model1 <- lm(as.formula(regression), data = TSAndEVs2021)
+        b00.model1 <- lm(as.formula(regression), data = SortedO_D_TS_EVs2021)
 
         # Calculate VIF values
         b00.VIFs <- vif(b00.model1)
@@ -69,7 +69,7 @@ generateMLRModel <- function(vifCutOff, corrCutOff, includedEVs, MLRModelName) {
     cat("\n--- Step 2&3: Correlation Filtering ---\n")
     if(length(b00.model2Vars) > 1) {
         # Get correlation matrix for remaining variables
-        b00.corrMatrix <- fullCorrMatrix$r[b00.model2Vars, b00.model2Vars]
+        b00.corrMatrix <- full39_ODT_CorrMatrix$r[b00.model2Vars, b00.model2Vars]
         # Find correlations above the correlation cut off
         b00.cutOffPairs <- which(abs(b00.corrMatrix) >= corrCutOff & b00.corrMatrix != 1, arr.ind = TRUE)
         
@@ -96,8 +96,8 @@ generateMLRModel <- function(vifCutOff, corrCutOff, includedEVs, MLRModelName) {
                 b00.var2VIF <- b00.VIFs[var2]
                 
                 # Get individual adjusted R^2
-                b00.var1AdjRSquared <- summary(lm(thermalSensitivity ~ get(var1), data = TSAndEVs2021))$adj.r.squared
-                b00.var2AdjRSquared <- summary(lm(thermalSensitivity ~ get(var2), data = TSAndEVs2021))$adj.r.squared
+                b00.var1AdjRSquared <- summary(lm(thermalSensitivity ~ get(var1), data = SortedO_D_TS_EVs2021))$adj.r.squared
+                b00.var2AdjRSquared <- summary(lm(thermalSensitivity ~ get(var2), data = SortedO_D_TS_EVs2021))$adj.r.squared
                 
                 cat(sprintf("  %s: VIF = %.2f, Adj R² = %.3f\n", var1, b00.var1VIF, b00.var1AdjRSquared))
                 cat(sprintf("  %s: VIF = %.2f, Adj R² = %.3f\n", var2, b00.var2VIF, b00.var2AdjRSquared))
@@ -138,7 +138,7 @@ generateMLRModel <- function(vifCutOff, corrCutOff, includedEVs, MLRModelName) {
     #4: Then used leaps R PACKAGE to select MULTIVARIATE REGRESSION that PRODUCED HIGHEST R^2
     cat("\n--- Step 4: Best Subset Selection ---\n")
     tryCatch({
-        b00.model3Data <- TSAndEVs2021[, c("thermalSensitivity", b00.model3Vars)]
+        b00.model3Data <- SortedO_D_TS_EVs2021[, c("thermalSensitivity", b00.model3Vars)]
         b00.bestSubset <- regsubsets(thermalSensitivity ~ ., data = b00.model3Data, 
                                     nbest = 1, nvmax = length(b00.model3Vars), method = "exhaustive")
         b00.bestSummary <- summary(b00.bestSubset)
@@ -161,7 +161,7 @@ generateMLRModel <- function(vifCutOff, corrCutOff, includedEVs, MLRModelName) {
     cat("\n--- Step 5: Final Model Creation ---\n")
     tryCatch({
         b00.finalRegression <- paste("thermalSensitivity ~", paste(b00.bestPredictors, collapse = " + "))
-        b00.model4 <- lm(as.formula(b00.finalRegression), data = TSAndEVs2021)
+        b00.model4 <- lm(as.formula(b00.finalRegression), data = SortedO_D_TS_EVs2021)
         b00.finalModel <- lm.beta(b00.model4)
         
         cat("Final model created successfully\n")
@@ -330,10 +330,10 @@ testParameterCombinations <- function(vif_cutoffs = c(5, 10, 15, 20),
             
             if(!is.null(model_result)) {
                 # Check direction consistency
-                direction_check <- checkDirection(model_result$model, fullCorrMatrix)
+                direction_check <- checkDirection(model_result$model, full39_ODT_CorrMatrix)
                 
                 # Generate detailed summary
-                detailed_summary <- generateInfoSummary(model_result$model, fullCorrMatrix, 
+                detailed_summary <- generateInfoSummary(model_result$model, full39_ODT_CorrMatrix, 
                                                        direction_check, model_name)
                 
                 # Add to comparison
@@ -364,10 +364,10 @@ testModel <- generateMLRModel(vifCutOff = 20, corrCutOff = 0.6,
 
 if(!is.null(testModel)) {
     # Check direction
-    direction_results <- checkDirection(testModel$model, fullCorrMatrix)
+    direction_results <- checkDirection(testModel$model, full39_ODT_CorrMatrix)
     
     # Generate comprehensive summary
-    model_summary <- generateInfoSummary(testModel$model, fullCorrMatrix, 
+    model_summary <- generateInfoSummary(testModel$model, full39_ODT_CorrMatrix, 
                                         direction_results, "TestModel")
     
     # Add to comparison tracker

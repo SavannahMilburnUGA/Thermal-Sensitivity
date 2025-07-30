@@ -32,13 +32,8 @@ saveRDS(SortedO_D_TS_EVs2021, "results/2021/RDS/SortedO_D_TS_EVs2021.RDS")
 # TEST for MULTICOLLINEARITY among EVs by examining VIF factor
 # & REMOVING any VALUES > 5
 
-# Loading RDS of thermal sensitivities joined w/ EV values for 2021
-TSAndEVs2021 <- readRDS("results/2021/RDS/TSandEVs2021.RDS")
-# Check
-nrow(TSAndEVs2021)
-
-# Create linear regression w/ thermal sensitivity as RV & landscape varbs as EVs
-a00.model1 <- lm(thermalSensitivity ~ SLOPE + Solar + Elev + BFI + h2oDevelop + h2oLakesPe + h2oAgricul + h2oBurnPer + h2oRdDens + h2oHiCascP + h2oWetland + h2oVegCov + h2oVegHt + Forest21 + Shrub21 + h2oKm2 + BurnRCA + AgricultRC + WetlandsRC + LakesRCA + HiCascRCA + DevelopRCA + RoadsRCA + VegCover + VegHeight_ + DevelopBuf + AgBuf + BurnBuf + WetlandBuf + LakesBuf + HiCascBuf + RoadsBuf + VegHtBuf + VegCovBuf + MeanMaxAir + MaxAir_C + Precip_mm + SumPrecip + MeanAirJJA + WetPrecip, data = TSAndEVs2021)
+# Create linear regression w/ thermal sensitivity as RV & 39 landscape + 4 DAYMET + 2 Orientation as EVs
+a00.model1 <- lm(thermalSensitivity ~ SLOPE + Elev + BFI + h2oDevelop + h2oLakesPe + h2oAgricul + h2oBurnPer + h2oRdDens + h2oHiCascP + h2oWetland + h2oVegCov + h2oVegHt + Forest21 + Shrub21 + h2oKm2 + BurnRCA + AgricultRC + WetlandsRC + LakesRCA + HiCascRCA + DevelopRCA + RoadsRCA + VegCover + VegHeight_ + DevelopBuf + AgBuf + BurnBuf + WetlandBuf + LakesBuf + HiCascBuf + RoadsBuf + VegHtBuf + VegCovBuf + MeanMaxAir + MaxAir_C + Precip_mm + SumPrecip + MeanAirJJA + WetPrecip + daymetDayl + daymetPrcp + daymetSRad + daymetVP + Azimuth + AbsAzimuth, data = SortedO_D_TS_EVs2021)
 
 # Load library to calculate VIF values
 # install.packages("car")
@@ -46,21 +41,21 @@ library(car)
 # Calculate VIF values
 a00.VIFs <- vif(a00.model1)
 # View VIF values run on model1
-print("All landscape variables with VIF values: ")
-print(a00.VIFs)
+print("39 landscape + 4 DAYMET + 2 Orientation EVs with VIF values: ")
+print(a00.VIFs) # Note: new DAYMET EVs are ~118, 51, 41, 239... BUT Orientations are SMALL
 # Saving VIF values
 write.csv(data.frame(Variable = names(a00.VIFs), VIF = a00.VIFs), "results/2021/MLR/initialModel/a00.VIFs.csv")
 
-# If use VIF > 5: only SLOPE would be included... 
-# If use VIF > 10: only 6 landscape variables
-# If use VIF > 20: 14 landscape variables
+# Using VIF > 20
 a00.EVsHighVIF <- a00.VIFs[a00.VIFs > 20]
-print("Landscape variables with VIF > 20: ")
+print("39 landscape + 4 DAYMET + 2 Orientation EVs with VIF > 20: ")
 print(a00.EVsHighVIF)
-
+# Removing 28 EVs: Elev, BFI, h2oDevelop, h2oAgricul, h2oBurnPer, h2oWetland, h2oVegCov, h2oVegHt, Forest21, Shrub21, LakesRCA, DevelopRCA, VegCover, VegHeight_
+# DevelopBuf, LakesBuf, VegHtBuf, VegCovBuf, MeanMaxAir, MaxAir_C, Precip_mm, SumPrecip, MeanAirJJA, WetPrecip, daymetDayl, daymetPrcp, daymetSRad, daymetVP 
 # Take out EVsHighVIF from model1
-# Create linear regression w/ thermal sensitivity as RV & landscape varbs as EVs that have VIFS <= 20
-a00.model2 <- lm(thermalSensitivity ~ SLOPE + Solar + h2oLakesPe + h2oRdDens + h2oHiCascP + h2oWetland + Shrub21 + h2oKm2 + BurnRCA + AgricultRC + WetlandsRC + HiCascRCA + RoadsRCA + AgBuf + BurnBuf + WetlandBuf + HiCascBuf + RoadsBuf, data = TSAndEVs2021)
+# Create linear regression w/ thermal sensitivity as RV & 39 landscape + 4 DAYMET + 2 Orientation as EVs that have VIFS <= 20
+# Only have 17 EVs now: 
+a00.model2 <- lm(thermalSensitivity ~ SLOPE + h2oLakesPe + h2oRdDens + h2oHiCascP + h2oKm2 + BurnRCA + AgricultRC + WetlandsRC + HiCascRCA + RoadsRCA + AgBuf + BurnBuf + WetlandBuf + HiCascBuf + RoadsBuf + Azimuth + AbsAzimuth, data = SortedO_D_TS_EVs2021)
 
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------
@@ -68,14 +63,14 @@ a00.model2 <- lm(thermalSensitivity ~ SLOPE + Solar + h2oLakesPe + h2oRdDens + h
 # & REMOVED VARBS w/ CORRELATION COEFFICIENTS > 0.9
 
 # Load full correlation matrix 
-fullCorrMatrix <- readRDS("results/2021/correlation/RDS/fullCorrMatrix.RDS")
-a00.model2Vars <- c("SLOPE", "Solar", "h2oLakesPe", "h2oRdDens", "h2oHiCascP", "h2oWetland", "Shrub21", "h2oKm2", "BurnRCA", "AgricultRC", "WetlandsRC", "HiCascRCA", "RoadsRCA", "AgBuf", "BurnBuf", "WetlandBuf", "HiCascBuf", "RoadsBuf")
+full39_ODT_CorrMatrix <- readRDS("results/2021/correlation/RDS/full39_ODT_CorrMatrix.RDS")
+a00.model2Vars <- c("SLOPE", "h2oLakesPe", "h2oRdDens", "h2oHiCascP", "h2oKm2", "BurnRCA", "AgricultRC", "WetlandsRC", "HiCascRCA", "RoadsRCA", "AgBuf", "BurnBuf", "WetlandBuf", "HiCascBuf", "RoadsBuf", "Azimuth", "AbsAzimuth")
 
 # Subset model2Vars from full correlation matrix
-a00.model2CorrMatrix <- fullCorrMatrix$r[a00.model2Vars, a00.model2Vars]
+a00.model2ODT_CorrMatrix <- full39_ODT_CorrMatrix$r[a00.model2Vars, a00.model2Vars]
 # Look for any correlation coefficients > 0.9 (ignore self-correlations OBVIII)
-View(a00.model2CorrMatrix)
-write.csv(a00.model2CorrMatrix, "results/2021/MLR/initialModel/a00.model2CorrMatrix.csv")
+View(a00.model2ODT_CorrMatrix)
+write.csv(a00.model2ODT_CorrMatrix, "results/2021/MLR/initialModel/a00.model2ODT_CorrMatrix.csv")
 # No correlation coefficients > 0.9
 
 #-------------------------------------------------------------------------------------------------------------------------------------------------
@@ -83,88 +78,56 @@ write.csv(a00.model2CorrMatrix, "results/2021/MLR/initialModel/a00.model2CorrMat
 # then REMOVED EVs w/ HIGH LINEAR CORRELATION VALUES that 
 # CONFOUNDED results from MULTICOLLINEAR ANALYSES - CORRELATION COEFFICIENT VALUES >= 0.6
 
-# Now find EVs with correlation coefficents >= 0.6: 
 # SLOPE & h2oKm2 : r = -0.7548
-## Stream channel slope & upstream area km2
-### VIFs: 4.038493 vs. 12.723293 - REMOVE h20km2
-summary(lm(thermalSensitivity ~ SLOPE, data = TSAndEVs2021))$adj.r.squared
-summary(lm(thermalSensitivity ~ h2oKm2, data = TSAndEVs2021))$adj.r.squared
-### adj R^2: 0.02 vs. 0a00.7 - REMOVE h20km2 both not good though
-summary(lm(thermalSensitivity ~ SLOPE, data = TSAndEVs2021))
-summary(lm(thermalSensitivity ~ h2oKm2, data = TSAndEVs2021))
-# DROP: h20km2 (SLOPE lower VIF, smaller std error)
-
+### VIFs: 7.1, 16.2 REMOVE h2oKm2
+summary(lm(thermalSensitivity ~ SLOPE, data = SortedO_D_TS_EVs2021))$adj.r.squared
+summary(lm(thermalSensitivity ~ h2oKm2, data = SortedO_D_TS_EVs2021))$adj.r.squared
+# DROP: h2oKm2
 
 # h2oHiCascP & HiCascRCA : r = 0.7142
-## Upstream high cascades geology & catchment high cascades area %
-### VIFs: 10.047336 vs. 9.448280 - REMOVE h20HiCascP but SIMILAR
-summary(lm(thermalSensitivity ~ h2oHiCascP, data = TSAndEVs2021))$adj.r.squared
-summary(lm(thermalSensitivity ~ HiCascRCA, data = TSAndEVs2021))$adj.r.squared
-### adj R^2: 0.56 vs. 0.19 - REMOVE HiCascRCA 
-summary(lm(thermalSensitivity ~ h2oHiCascP, data = TSAndEVs2021))
-summary(lm(thermalSensitivity ~ HiCascRCA, data = TSAndEVs2021))
-# DROP: HiCascRCA (h2oHiCascP much larger adj R62, more significant)
+### VIFs: 14.7, 11.1 REMOVE h2oHiCascP
+summary(lm(thermalSensitivity ~ h2oHiCascP, data = SortedO_D_TS_EVs2021))$adj.r.squared
+summary(lm(thermalSensitivity ~ HiCascRCA, data = SortedO_D_TS_EVs2021))$adj.r.squared
+# DROP: HiCascRCA
+
+# BurnRCA & BurnBuf :  r = 0.819
+### VIFs: 12.3, 19.8 REMOVE BurnBuf
+summary(lm(thermalSensitivity ~ BurnRCA, data = SortedO_D_TS_EVs2021))$adj.r.squared
+summary(lm(thermalSensitivity ~ BurnBuf, data = SortedO_D_TS_EVs2021))$adj.r.squared
+# DROP: BurnBuf BUT BOTH BAD
+
+# AgricultRC & AgBuf :  r = 0.8356
+### VIFs: 17.4, 15.7 TOO SIMILAR
+summary(lm(thermalSensitivity ~ AgricultRC, data = SortedO_D_TS_EVs2021))$adj.r.squared
+summary(lm(thermalSensitivity ~ AgBuf, data = SortedO_D_TS_EVs2021))$adj.r.squared
+# DROP: AgBuf
 
 
-# AgricultRC & AgBuf : r = 0.8356 
-## Catchment agricultural area % & buffer agricultural area %
-### VIFs: 18.036515 vs. 11.209889 - REMOVE AgricultRC
-summary(lm(thermalSensitivity ~ AgricultRC, data = TSAndEVs2021))$adj.r.squared
-summary(lm(thermalSensitivity ~ AgBuf, data = TSAndEVs2021))$adj.r.squared
-### adj R^2: 0.26 vs. 0.08 - REMOVE AgBuf 
-summary(lm(thermalSensitivity ~ AgricultRC, data = TSAndEVs2021))
-summary(lm(thermalSensitivity ~ AgBuf, data = TSAndEVs2021))
-# DROP: AgBuf (AgricultRC has higher VIF BUT, higher adj R^2, lower std error, stronger sig)
+# WetlandsRC & WetlandBuf :  r = 0.8923
+### VIFs: 10.2, 8.5 TOO SIMILAR
+summary(lm(thermalSensitivity ~ WetlandsRC, data = SortedO_D_TS_EVs2021))$adj.r.squared
+summary(lm(thermalSensitivity ~ WetlandBuf, data = SortedO_D_TS_EVs2021))$adj.r.squared
+# DROP: WetlandBuf
+
+# HiCascRCA & HiCascBuf :  r = 0.8758
+### VIFs: 11.1, 5.7 REMOVE HiCascRCA
+summary(lm(thermalSensitivity ~ HiCascRCA, data = SortedO_D_TS_EVs2021))$adj.r.squared
+summary(lm(thermalSensitivity ~ HiCascBuf, data = SortedO_D_TS_EVs2021))$adj.r.squared
+# DROP: HiCascRCA
+
+# RoadsRCA & RoadsBuf :  r = 0.6012
+### VIFs: 11.0, 7.0 REMOVE RoadsRCA
+summary(lm(thermalSensitivity ~ RoadsRCA, data = SortedO_D_TS_EVs2021))$adj.r.squared
+summary(lm(thermalSensitivity ~ RoadsBuf, data = SortedO_D_TS_EVs2021))$adj.r.squared
+# DROP: RoadsRCA but BOTH BAD
 
 
-# BurnBuf & BurnRCA : r = 0.819
-## Buffer burn area % & catchment burn area %
-### VIFs: 17.661771 vs. 8.875225 - REMOVE BurnBuf
-summary(lm(thermalSensitivity ~ BurnBuf, data = TSAndEVs2021))$adj.r.squared
-summary(lm(thermalSensitivity ~ BurnRCA, data = TSAndEVs2021))$adj.r.squared
-### adj R^2: -0a00.1 vs. -0.010 - REMOVE BurnRCA but both bad
-summary(lm(thermalSensitivity ~ BurnBuf, data = TSAndEVs2021))
-summary(lm(thermalSensitivity ~ BurnRCA, data = TSAndEVs2021))
-# DROP: BurnBuf (BurnRCA has lower VIF but both LOW adj R^2)
-
-
-# WetlandsRC & WetlandBuf : r = 0.8923
-## catchment wetlands area % & buffer wetland area %
-### VIFs: 9.208864 vs. 6.790878 - REMOVE WetlandsRC
-summary(lm(thermalSensitivity ~ WetlandsRC, data = TSAndEVs2021))$adj.r.squared
-summary(lm(thermalSensitivity ~ WetlandBuf, data = TSAndEVs2021))$adj.r.squared
-### adj R^2: 0.02 vs. 0a00.4 - REMOVE WetlandBuf
-summary(lm(thermalSensitivity ~ WetlandsRC, data = TSAndEVs2021))
-summary(lm(thermalSensitivity ~ WetlandBuf, data = TSAndEVs2021))
-# DROP: WetlandBuf (WetlandsRC higher adj R^2, lower p-value despite higher VIF)
-
-
-# HiCascRCA & HiCascBuf : r = 0.8758 
-## Catchment high casc area % & buffer high casc area %
-### VIFs: 9.448280 vs. 5.630197 - REMOVE HiCascRCA
-summary(lm(thermalSensitivity ~ HiCascRCA, data = TSAndEVs2021))$adj.r.squared
-summary(lm(thermalSensitivity ~ HiCascBuf, data = TSAndEVs2021))$adj.r.squared
-### adj R^2: 0.19 vs. 0.12 - REMOVE HiCascBuf but SIMILAR
-summary(lm(thermalSensitivity ~ HiCascRCA, data = TSAndEVs2021))
-summary(lm(thermalSensitivity ~ HiCascBuf, data = TSAndEVs2021))
-# DROP: HiCascRCA since ALREADY DROPPED - keep HiCascBuf
-
-
-# RoadsRCA & RoadsBuf : r = 0.6012
-## catchment road density & buffer road density 
-### VIFs: 10.457899 vs. 6.504549 0 REMOVE RoadsRCA
-summary(lm(thermalSensitivity ~ RoadsRCA, data = TSAndEVs2021))$adj.r.squared
-summary(lm(thermalSensitivity ~ RoadsBuf, data = TSAndEVs2021))$adj.r.squared
-### adj R^2: -0.01 vs. -0.01 - BOTH BAD
-summary(lm(thermalSensitivity ~ RoadsRCA, data = TSAndEVs2021))
-summary(lm(thermalSensitivity ~ RoadsBuf, data = TSAndEVs2021))
-# DROP: RoadsRCA (RoadsBuf had lower VIF but could DROP BOTH since adj R^2 bad)
-
-# Landscape variables being dropped: h20km2, HiCascRCA, AgBuf, BurnBuf, WetlandBuf, RoadsRCA
+# Landscape variables being dropped: h2oKm2, HiCascRCA, BurnBuf, AgBuf, WetlandBuf, RoadsRCA - !!!! BUTTTT BurnBuf & RoadsRCA both bad
 
 # Take out dropped landscape variables from model2
-# Create linear regression w/ thermal sensitivity as RV & landscape varbs as EVs that confound results
-a00.model3 <- lm(thermalSensitivity ~ SLOPE + Solar + h2oLakesPe + h2oRdDens + h2oHiCascP + h2oWetland + Shrub21 + BurnRCA + AgricultRC + WetlandsRC + HiCascBuf + RoadsBuf, data = TSAndEVs2021)
+# Create linear regression w/ thermal sensitivity as RV & EVs that confound results
+# Now have 11 (NOTE: BurnBuf, RoadsRCA both bad also)
+a00.model3 <- lm(thermalSensitivity ~ SLOPE + h2oLakesPe + h2oRdDens + h2oHiCascP + BurnRCA + AgricultRC + WetlandsRC + HiCascBuf + RoadsBuf + Azimuth + AbsAzimuth, data = SortedO_D_TS_EVs2021)
 #-------------------------------------------------------------------------------------------------------------------------------------------------
 #4: Then used leaps R PACKAGE to select MULTIVARIATE REGRESSION that PRODUCED HIGHEST R^2
 # Load leaps package
@@ -172,21 +135,21 @@ a00.model3 <- lm(thermalSensitivity ~ SLOPE + Solar + h2oLakesPe + h2oRdDens + h
 library(leaps)
 
 # Define landscape variables from model3
-a00.model3Vars <- c("SLOPE", "Solar", "h2oLakesPe", "h2oRdDens", "h2oHiCascP", "h2oWetland", "Shrub21", "BurnRCA", "AgricultRC", "WetlandsRC", "HiCascBuf", "RoadsBuf")
+a00.model3Vars <- c("SLOPE", "h2oLakesPe", "h2oRdDens", "h2oHiCascP", "BurnRCA", "AgricultRC", "WetlandsRC", "HiCascBuf", "RoadsBuf", "Azimuth", "AbsAzimuth")
 
 # Run regsubsets() on all model3 landscape variables
 a00.bestSubset <-
-    regsubsets(thermalSensitivity~., data =TSAndEVs2021[ , c("thermalSensitivity", a00.model3Vars)], nbest = 1, nvmax = length(a00.model3Vars), force.in = NULL, force.out = NULL, method = "exhaustive")
+    regsubsets(thermalSensitivity~., data =SortedO_D_TS_EVs2021[ , c("thermalSensitivity", a00.model3Vars)], nbest = 1, nvmax = length(a00.model3Vars), force.in = NULL, force.out = NULL, method = "exhaustive")
 a00.summaryBestSubset <- summary(a00.bestSubset)
 as.data.frame(a00.summaryBestSubset$outmat)
 # Ran leaps through dataset -> what recommended # of predictors to use
-which.max(a00.summaryBestSubset$adjr2) # 9 
+which.max(a00.summaryBestSubset$adjr2) # 4
 # What are the best predictors
-a00.summaryBestSubset$which[9, ]
-# SLOPE, Solar, h2oLakesPe, h2oHiCascP, h2oWetland, Shrub21, BurnRCA, AgricultRC, WetlandsRC
+a00.summaryBestSubset$which[4, ]
+# SLOPE, h2oRdDens, h2oHiCascP, AgricultRC
 
-# Create linear regression w/ thermal sensitivity as RV & landscape varbs as EVs recommended by leaps 
-a00.model4 <- lm(thermalSensitivity ~ SLOPE + Solar + h2oLakesPe + h2oHiCascP + h2oWetland + Shrub21 + BurnRCA + AgricultRC + WetlandsRC, data = TSAndEVs2021)
+# Create linear regression w/ thermal sensitivity as RV & EVs recommended by leaps 
+a00.model4 <- lm(thermalSensitivity ~ SLOPE + h2oRdDens + h2oHiCascP + AgricultRC, data = SortedO_D_TS_EVs2021)
 #-------------------------------------------------------------------------------------------------------------------------------------------------
 #5: Then used lm.beta PACKAGE to EXTRACT STANDARDIZED BETA COEFFICIENT 
 # (estimates RELATIVE EFFECT of EACH EV on RV)
@@ -223,22 +186,3 @@ dev.off()
 shapiro.test(residuals(a00.model5))  # Normality test
 summary(a00.model5)$r.squared  # Check R²
 summary(a00.model5)$adj.r.squared  # Check adjusted R²
-
-#----------------------------------------------------------------------------------------------------------------
-## Testing individual models
-
-# Change landscape EVs
-baseModelVars <- c("SLOPE", "Solar", "h2oLakesPe", "h2oHiCascP", "h2oWetland", "Shrub21", "h2oKm2", "BurnRCA")
-# change 2x : vector & nvmax
-baseBestSubset <-
-    regsubsets(thermalSensitivity~., data =TSAndEVs2021[ , c("thermalSensitivity", baseModelVars)], nbest = 1, nvmax = length(baseModelVars), force.in = NULL, force.out = NULL, method = "exhaustive")
-baseSummaryBestSubset <- summary(baseBestSubset)
-as.data.frame(baseSummaryBestSubset$outmat)
-which.max(baseSummaryBestSubset$adjr2)
-baseSummaryBestSubset$which[8, ] # Change num - copy paste below but don't forget data = TSAndEVs2021
-baseModel <- lm(thermalSensitivity~ SLOPE+Solar+h2oLakesPe+h2oHiCascP+h2oWetland+Shrub21+h2oKm2+BurnRCA, data=TSAndEVs2021)
-# Summary
-baseModelStd <- lm.beta(baseModel)
-summary(baseModelStd)
-coef(baseModelStd)
-summary(baseModelStd)$adj.r.squared 

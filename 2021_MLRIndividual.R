@@ -162,7 +162,7 @@ library(lm.beta)
 a00.model5 <- lm.beta(a00.model4)
 print(a00.model5)
 # Summary with standarized coefficients
-summary(a00.model5)
+summary(a00.model5) # 3/4 SIG w/ adj-R-squared 0.6363
 # Extracts standardized beta coefficients only
 coef(a00.model5)
 # Creates table format
@@ -186,3 +186,72 @@ dev.off()
 shapiro.test(residuals(a00.model5))  # Normality test
 summary(a00.model5)$r.squared  # Check R²
 summary(a00.model5)$adj.r.squared  # Check adjusted R²
+
+#-------------------------------------------------------------------------------------------------------------------------------------------------
+# (NOTE: BurnRCA, RoadsBuf both bad also) - taking out cuz they individually did not explain that much variability in TS
+
+# MODEL A)
+# Removing RoadsBuf
+a00.model3A <- lm(thermalSensitivity ~ SLOPE + h2oLakesPe + h2oRdDens + h2oHiCascP + BurnRCA + AgricultRC + WetlandsRC + HiCascBuf + Azimuth + AbsAzimuth, data = SortedO_D_TS_EVs2021)
+# Define landscape variables from model3
+a00.model3VarsA <- c("SLOPE", "h2oLakesPe", "h2oRdDens", "h2oHiCascP", "BurnRCA", "AgricultRC", "WetlandsRC", "HiCascBuf", "Azimuth", "AbsAzimuth")
+
+# Run regsubsets() on all model3 landscape variables
+a00.bestSubsetA <-
+    regsubsets(thermalSensitivity~., data =SortedO_D_TS_EVs2021[ , c("thermalSensitivity", a00.model3VarsA)], nbest = 1, nvmax = length(a00.model3VarsA), force.in = NULL, force.out = NULL, method = "exhaustive")
+a00.summaryBestSubsetA <- summary(a00.bestSubsetA)
+as.data.frame(a00.summaryBestSubsetA$outmat)
+# Ran leaps through dataset -> what recommended # of predictors to use
+which.max(a00.summaryBestSubsetA$adjr2) # 4
+# What are the best predictors
+a00.summaryBestSubsetA$which[4, ]
+# SLOPE, h2oRdDens, h2oHiCAscp, AgricultRC
+# Create linear regression w/ thermal sensitivity as RV & EVs recommended by leaps 
+a00.model4A <- lm(thermalSensitivity ~ SLOPE + h2oRdDens + h2oHiCascP + AgricultRC, data = SortedO_D_TS_EVs2021)
+a00.model5A <- lm.beta(a00.model4A)
+# Summary with standarized coefficients
+summary(a00.model5A) # 3/4 SIG w/ adj-R-squared 0.6363 - same model
+#--------------------------------------------------------
+# MODEL B)
+# Removing BurnRCA
+a00.model3B <- lm(thermalSensitivity ~ SLOPE + h2oLakesPe + h2oRdDens + h2oHiCascP + AgricultRC + WetlandsRC + HiCascBuf + RoadsBuf + Azimuth + AbsAzimuth, data = SortedO_D_TS_EVs2021)
+# Define landscape variables from model3
+a00.model3VarsB <- c("SLOPE", "h2oLakesPe", "h2oRdDens", "h2oHiCascP", "AgricultRC", "WetlandsRC", "HiCascBuf", "RoadsBuf", "Azimuth", "AbsAzimuth")
+
+# Run regsubsets() on all model3 landscape variables
+a00.bestSubsetB <-
+    regsubsets(thermalSensitivity~., data =SortedO_D_TS_EVs2021[ , c("thermalSensitivity", a00.model3VarsB)], nbest = 1, nvmax = length(a00.model3VarsB), force.in = NULL, force.out = NULL, method = "exhaustive")
+a00.summaryBestSubsetB <- summary(a00.bestSubsetB)
+as.data.frame(a00.summaryBestSubsetB$outmat)
+# Ran leaps through dataset -> what recommended # of predictors to use
+which.max(a00.summaryBestSubsetB$adjr2) #4
+# What are the best predictors
+a00.summaryBestSubsetB$which[4, ]
+# SLOPE, h2oRdDens, h2oHiCascP, AgricultRC
+# Create linear regression w/ thermal sensitivity as RV & EVs recommended by leaps 
+a00.model4B <- lm(thermalSensitivity ~ SLOPE + h2oRdDens + h2oHiCascP + AgricultRC, data = SortedO_D_TS_EVs2021)
+a00.model5B <- lm.beta(a00.model4B)
+# Summary with standarized coefficients
+summary(a00.model5B) # 3/4 SIG w/ adj-R-squared 0.6363 - same model
+#--------------------------------
+# MODEL C)
+# Removing BurnRCA & RoadsBuf
+a00.model3C <- lm(thermalSensitivity ~ SLOPE + h2oLakesPe + h2oRdDens + h2oHiCascP + AgricultRC + WetlandsRC + HiCascBuf + Azimuth + AbsAzimuth, data = SortedO_D_TS_EVs2021)
+# Define landscape variables from model3
+a00.model3VarsC <- c("SLOPE", "h2oLakesPe", "h2oRdDens", "h2oHiCascP", "AgricultRC", "WetlandsRC", "HiCascBuf", "Azimuth", "AbsAzimuth")
+
+# Run regsubsets() on all model3 landscape variables
+a00.bestSubsetC <-
+    regsubsets(thermalSensitivity~., data =SortedO_D_TS_EVs2021[ , c("thermalSensitivity", a00.model3VarsC)], nbest = 1, nvmax = length(a00.model3VarsC), force.in = NULL, force.out = NULL, method = "exhaustive")
+a00.summaryBestSubsetC <- summary(a00.bestSubsetC)
+as.data.frame(a00.summaryBestSubsetC$outmat)
+# Ran leaps through dataset -> what recommended # of predictors to use
+which.max(a00.summaryBestSubsetC$adjr2) #4
+# What are the best predictors
+a00.summaryBestSubsetC$which[4, ]
+# SLOPE, h2oRdDens, h2oHiCascP, AgricultRC
+# Create linear regression w/ thermal sensitivity as RV & EVs recommended by leaps 
+a00.model4C <- lm(thermalSensitivity ~ SLOPE + h2oRdDens + h2oHiCascP + AgricultRC, data = SortedO_D_TS_EVs2021)
+a00.model5C <- lm.beta(a00.model4C)
+# Summary with standarized coefficients
+summary(a00.model5C) # 3/4 SIG w/ adj-R-squared 0.6363 - same model

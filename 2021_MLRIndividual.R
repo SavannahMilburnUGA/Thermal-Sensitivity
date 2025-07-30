@@ -6,6 +6,28 @@ rm(list = ls())
 # Close old plots
 while (!is.null(dev.list())) dev.off()
 #------------------------------------------------------------------------------------------------------------------------------------------------
+# Join SortedTSAndEVs with DAYMET data & stream orientation 
+# Load SortedDaymetTSAndEVs2021 from when DAYMET EVs were downloaded
+SortedD_TS_EVs2021 <- readRDS("results/2021/RDS/SortedD_TS_EVs_2021.RDS")
+
+# Read the 2021 orientation data - Index - Heading - Stream - LocalFlow - Azimuth - AbsAzimuth
+orientation2021 <- read.csv("data/2021Orientation.csv")
+
+# Join Sorted Daymet, TS, EVs, and Orientation data together by index - sorted N to S
+library(tidyverse)
+SortedO_D_TS_EVs2021 <- SortedD_TS_EVs2021 %>%
+    left_join(orientation2021, by = c("index" = "Index"))
+
+# Rename DAYMET EV columns to be more readable: old was daymet_dayl (s), daymet_prcp (mm/day), daymet_srad(W/m^2), daymet_swe(kg/m^2), daymet_tmax(deg c), daymet_tmin(deg c), daymet_vp (Pa)
+SortedO_D_TS_EVs2021 <- SortedO_D_TS_EVs2021 %>%
+    rename(daymetDayl = `daymet_dayl (s)`, daymetPrcp = `daymet_prcp (mm/day)`, daymetSRad = `daymet_srad (W/m^2)`, daymetSWE = `daymet_swe (kg/m^2)`, daymetTMax = `daymet_tmax (deg c)`, daymetTMin = `daymet_tmin (deg c)`, daymetVP = `daymet_vp (Pa)`)
+
+# Selecting columns: take out Solar from Michael EVs, DAYMET SWE, tmax, tmin, & categorical varbs from Orientation
+## Including index - site - x - y- thermalSensitivity - ... - 39 landscape EVs - daymetDayl, daymetPrcp, daymetSRad, daymetVP, Azimuth, AbsAzimuth
+SortedO_D_TS_EVs2021 <- SortedO_D_TS_EVs2021 %>%
+    select(-Solar, -daymetSWE, -daymetTMax, -daymetTMin, -Heading, -Stream, -Local.Flow)
+saveRDS(SortedO_D_TS_EVs2021, "results/2021/RDS/SortedO_D_TS_EVs2021.RDS")
+#------------------------------------------------------------------------------------------------------------------------------------------------
 #1: BEFORE conducting MULTIVARIATE CORRELATIONS, 
 # TEST for MULTICOLLINEARITY among EVs by examining VIF factor
 # & REMOVING any VALUES > 5

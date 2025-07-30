@@ -1,6 +1,0 @@
-Variable,TSCorrelation,CorrelationDirection,StdCoefficient,StdCoefficientDirection,DirectionMatch
-SLOPE,-0.28205644578558814,Negative,-0.24225452358119123,Negative,TRUE
-h2oLakesPe,-0.15386186555194964,Negative,-0.26777160644987147,Negative,TRUE
-WetlandBuf,0.140769789496879,Positive,-0.17927672152802498,Negative,FALSE
-HiCascBuf,-0.4794946192899239,Negative,-0.3658802602469504,Negative,TRUE
-RoadsBuf,-0.009203320674332972,Negative,-0.11175031323901487,Negative,TRUE

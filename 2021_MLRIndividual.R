@@ -25,7 +25,7 @@ SortedO_D_TS_EVs2021 <- SortedO_D_TS_EVs2021 %>%
 # Selecting columns: take out Solar from Michael EVs, DAYMET SWE, tmax, tmin, & categorical varbs from Orientation
 ## Including index - site - x - y- thermalSensitivity - ... - 39 landscape EVs - daymetDayl, daymetPrcp, daymetSRad, daymetVP, Azimuth, AbsAzimuth
 SortedO_D_TS_EVs2021 <- SortedO_D_TS_EVs2021 %>%
-    select(-Solar, -daymetSWE, -daymetTMax, -daymetTMin, -Heading, -Stream, -Local.Flow)
+    select(-Solar, -daymetSWE, -daymetTMax, -daymetTMin, -Heading, -Stream, -Local.Flow, -Azimuth)
 saveRDS(SortedO_D_TS_EVs2021, "results/2021/RDS/SortedO_D_TS_EVs2021.RDS")
 #------------------------------------------------------------------------------------------------------------------------------------------------
 #1: BEFORE conducting MULTIVARIATE CORRELATIONS, 
@@ -33,7 +33,7 @@ saveRDS(SortedO_D_TS_EVs2021, "results/2021/RDS/SortedO_D_TS_EVs2021.RDS")
 # & REMOVING any VALUES > 5
 
 # Create linear regression w/ thermal sensitivity as RV & 39 landscape + 4 DAYMET + 2 Orientation as EVs
-a00.model1 <- lm(thermalSensitivity ~ SLOPE + Elev + BFI + h2oDevelop + h2oLakesPe + h2oAgricul + h2oBurnPer + h2oRdDens + h2oHiCascP + h2oWetland + h2oVegCov + h2oVegHt + Forest21 + Shrub21 + h2oKm2 + BurnRCA + AgricultRC + WetlandsRC + LakesRCA + HiCascRCA + DevelopRCA + RoadsRCA + VegCover + VegHeight_ + DevelopBuf + AgBuf + BurnBuf + WetlandBuf + LakesBuf + HiCascBuf + RoadsBuf + VegHtBuf + VegCovBuf + MeanMaxAir + MaxAir_C + Precip_mm + SumPrecip + MeanAirJJA + WetPrecip + daymetDayl + daymetPrcp + daymetSRad + daymetVP + Azimuth + AbsAzimuth, data = SortedO_D_TS_EVs2021)
+a00.model1 <- lm(thermalSensitivity ~ SLOPE + Elev + BFI + h2oDevelop + h2oLakesPe + h2oAgricul + h2oBurnPer + h2oRdDens + h2oHiCascP + h2oWetland + h2oVegCov + h2oVegHt + Forest21 + Shrub21 + h2oKm2 + BurnRCA + AgricultRC + WetlandsRC + LakesRCA + HiCascRCA + DevelopRCA + RoadsRCA + VegCover + VegHeight_ + DevelopBuf + AgBuf + BurnBuf + WetlandBuf + LakesBuf + HiCascBuf + RoadsBuf + VegHtBuf + VegCovBuf + MeanMaxAir + MaxAir_C + Precip_mm + SumPrecip + MeanAirJJA + WetPrecip + daymetDayl + daymetPrcp + daymetSRad + daymetVP + AbsAzimuth, data = SortedO_D_TS_EVs2021)
 
 # Load library to calculate VIF values
 # install.packages("car")

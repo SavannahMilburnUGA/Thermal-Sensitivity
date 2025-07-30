@@ -1,6 +1,8 @@
 ## Experimenting w/ MLR to find best criteria & EVs - no Solar + DAYMET + orientation 
 ## Running MLR using 2.4 section - initial model - no Solar + DAYMET + orientation 
 
+## Removed Azimuth & WetlandsRC
+
 # Clean house & remove saved files (keeping it clean)
 # Remove all objects in workspace 
 rm(list = ls())
@@ -15,7 +17,7 @@ nrow(SortedO_D_TS_EVs2021)
 # Load full correlation matrix
 full39_ODT_CorrMatrix <- readRDS("results/2021/correlation/RDS/full39_ODT_CorrMatrix.RDS")
 # Define 39 EVs/landscape variables from Michael - no Solar + 4 DAYMET EVs + Azimuth & AbsAzimuth
-EVs2021 <- c("SLOPE", "Elev", "BFI", "h2oDevelop", "h2oLakesPe", "h2oAgricul", "h2oBurnPer", "h2oRdDens", "h2oHiCascP", "h2oWetland", "h2oVegCov", "h2oVegHt", "Forest21", "Shrub21", "h2oKm2", "BurnRCA", "AgricultRC", "WetlandsRC", "LakesRCA", "HiCascRCA", "DevelopRCA", "RoadsRCA", "VegCover", "VegHeight_","DevelopBuf", "AgBuf", "BurnBuf", "WetlandBuf", "LakesBuf", "HiCascBuf", "RoadsBuf", "VegHtBuf", "VegCovBuf","MeanMaxAir", "MaxAir_C", "Precip_mm", "SumPrecip", "MeanAirJJA", "WetPrecip", "daymetDayl", "daymetPrcp", "daymetSRad", "daymetVP", "Azimuth", "AbsAzimuth")
+EVs2021 <- c("SLOPE", "Elev", "BFI", "h2oDevelop", "h2oLakesPe", "h2oAgricul", "h2oBurnPer", "h2oRdDens", "h2oHiCascP", "h2oWetland", "h2oVegCov", "h2oVegHt", "Forest21", "Shrub21", "h2oKm2", "BurnRCA", "AgricultRC", "LakesRCA", "HiCascRCA", "DevelopRCA", "RoadsRCA", "VegCover", "VegHeight_","DevelopBuf", "AgBuf", "BurnBuf", "WetlandBuf", "LakesBuf", "HiCascBuf", "RoadsBuf", "VegHtBuf", "VegCovBuf","MeanMaxAir", "MaxAir_C", "Precip_mm", "SumPrecip", "MeanAirJJA", "WetPrecip", "daymetDayl", "daymetPrcp", "daymetSRad", "daymetVP", "AbsAzimuth")
 
 #------------------------------------------------------------------------------------------------------------------------------------------------
 # Load libraries

@@ -221,8 +221,6 @@ write_csv(model4InfoSummary, "results/2021/MLR/Model 4 Info Summary.csv")
 xtable::xtable(betaModel4)
 
 
-
-
 # Checking model5
 # Test model assumptions
 # Residual plots
@@ -233,3 +231,17 @@ dev.off()
 shapiro.test(residuals(betaModel4))  # Normality test
 summary(betaModel4)$r.squared  # Check R²
 summary(betaModel4)$adj.r.squared  # Check adjusted R²
+#-------------------------------------------------------------------------------------------------------------------------------------------
+summary(betaModel4)
+# Current model: betaModel4
+# Sig to least: h2oHiCascP, Shrub21, BurnRCA, h2oWetland, SLOPE + h2oLakesPe (NOT SIGNFICANT) -> 0.633
+
+
+# Run stepwise linear regression after removing high VIFs
+# If bad: try binning "useful" covariates via equal width/frequency & stepwise regression again
+
+# If bad still: regularization: LASSO or Ridge Regression
+
+
+# Interaction: you have prior reason to think that effect of one varb might depend on what is happening w/ another varb
+# 
